@@ -64,28 +64,40 @@ export default class App extends Component {
 
     };
 
+    // submitAndGetType = () => {
+    //     var finalWala = this.streamAndUpdate;
+    //     var serverUrl = "http://localhost:3000/someRoute?url=";
+    //     var restApiUrl = this.state.restApiUrl;
+    //     var xhttp = new XMLHttpRequest();
+    //     xhttp.onreadystatechange = function() {
+    //         try {
+    //             var responseObj = JSON.parse(xhttp.responseText.toString());
+    //             if(responseObj.type){
+    //                 console.log("yeah, it came.");
+    //                 finalWala(responseObj);
+    //                 return;
+    //             }
+    //         }catch(err){
+    //             console.log(err.toString()+" ,but karan is awesome.");
+    //         }
+    //
+    //     }
+    //     xhttp.open("GET",serverUrl+restApiUrl,true);
+    //     var res = xhttp.send(null);
+    //     // console.log(xhttp.responseText);
+    //     // console.log(response);
+    // };
+
     submitAndGetType = () => {
         var finalWala = this.streamAndUpdate;
-        var serverUrl = "http://localhost:3000/someRoute?url=";
+        var serverUrl = "http://localhost:3000/someRouteAuth?url=";
         var restApiUrl = this.state.restApiUrl;
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            try {
-                var responseObj = JSON.parse(xhttp.responseText.toString());
-                if(responseObj.type){
-                    console.log("yeah, it came.");
-                    finalWala(responseObj);
-                    return;
-                }
-            }catch(err){
-                console.log(err.toString()+" ,but karan is awesome.");
-            }
-
-        }
-        xhttp.open("GET",serverUrl+restApiUrl,true);
-        var res = xhttp.send(null);
-        // console.log(xhttp.responseText);
-        // console.log(response);
+        var streamAndUpdate = this.streamAndUpdate; // TODO -  any better way?
+        var jqxhr = $.ajax(serverUrl+restApiUrl, function(data){
+            //console.log(data);//TODO-- this is Tricky.
+        }).done(function(data){
+            streamAndUpdate(data);
+        });
     };
 
     render() {
