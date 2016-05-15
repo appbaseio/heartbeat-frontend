@@ -3,6 +3,10 @@ import TextField from 'material-ui/TextField';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import RaisedButton from 'material-ui/RaisedButton';
+// import AwesomeForm from './awesomeForm.js';
+import GetHeaders from './getHeaders.js';
+import GetParams from './getParams.js';
+import GetBody from './getBody.js';
 
 export default class App extends Component {
 
@@ -10,7 +14,8 @@ export default class App extends Component {
     state = {
         restApiUrl : "",
         data : "",
-        changedNum: 0
+        changedNum: 0,
+        body : ""
     };
 
     handleUrlChange = (e) => {
@@ -64,36 +69,17 @@ export default class App extends Component {
 
     };
 
-    // submitAndGetType = () => {
-    //     var finalWala = this.streamAndUpdate;
-    //     var serverUrl = "http://localhost:3000/someRoute?url=";
-    //     var restApiUrl = this.state.restApiUrl;
-    //     var xhttp = new XMLHttpRequest();
-    //     xhttp.onreadystatechange = function() {
-    //         try {
-    //             var responseObj = JSON.parse(xhttp.responseText.toString());
-    //             if(responseObj.type){
-    //                 console.log("yeah, it came.");
-    //                 finalWala(responseObj);
-    //                 return;
-    //             }
-    //         }catch(err){
-    //             console.log(err.toString()+" ,but karan is awesome.");
-    //         }
-    //
-    //     }
-    //     xhttp.open("GET",serverUrl+restApiUrl,true);
-    //     var res = xhttp.send(null);
-    //     // console.log(xhttp.responseText);
-    //     // console.log(response);
-    // };
-
     submitAndGetType = () => {
+        var objectToSend = {
+            headers : this.refs.headers.state,
+            body : this.refs.body.state,
+            params : this.refs.params.state
+        }
         var finalWala = this.streamAndUpdate;
         var serverUrl = "http://localhost:3000/someRouteAuth?url=";
         var restApiUrl = this.state.restApiUrl;
         var streamAndUpdate = this.streamAndUpdate; // TODO -  any better way?
-        var jqxhr = $.ajax(serverUrl+restApiUrl, function(data){
+        var jqxhr = $.post(serverUrl+restApiUrl, objectToSend , function(data){
             //console.log(data);//TODO-- this is Tricky.
         }).done(function(data){
             streamAndUpdate(data);
@@ -126,6 +112,14 @@ export default class App extends Component {
                 <div>
                     Your JSON:<br />
                     {this.state.data}
+                </div>
+
+                <div>
+                    new things -- <br /> TODO -- //delete this line <br />
+                    <GetHeaders ref="headers" />
+                    <GetParams ref="params" />
+                    <GetBody ref="body" />
+
                 </div>
 
             </div>
