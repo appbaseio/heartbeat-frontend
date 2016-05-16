@@ -7,6 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import GetHeaders from './getHeaders.js';
 import GetParams from './getParams.js';
 import GetBody from './getBody.js';
+import GetAuthDetails from './getAuthDetails.js';
+
 
 export default class App extends Component {
 
@@ -73,7 +75,8 @@ export default class App extends Component {
         var objectToSend = {
             headers : this.refs.headers.state,
             body : this.refs.body.state,
-            params : this.refs.params.state
+            params : this.refs.params.state,
+            authDetails : this.refs.authDetails.state
         }
         var finalWala = this.streamAndUpdate;
         var serverUrl = "http://localhost:3000/someRouteAuth?url=";
@@ -120,6 +123,10 @@ export default class App extends Component {
                     <GetParams ref="params" />
                     <GetBody ref="body" />
 
+                </div>
+
+                <div>
+                    <GetAuthDetails ref = "authDetails" />
                 </div>
 
             </div>
