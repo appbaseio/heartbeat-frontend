@@ -8,6 +8,7 @@ import GetHeaders from './getHeaders.js';
 import GetParams from './getParams.js';
 import GetBody from './getBody.js';
 import GetAuthDetails from './getAuthDetails.js';
+import MethodBox from './methodBox.js';
 
 
 export default class App extends Component {
@@ -76,7 +77,8 @@ export default class App extends Component {
             headers : this.refs.headers.state,
             body : this.refs.body.state,
             params : this.refs.params.state,
-            authDetails : this.refs.authDetails.state
+            authDetails : this.refs.authDetails.state,
+            method : this.refs.method.state.method
         }
         var finalWala = this.streamAndUpdate;
         var serverUrl = "http://localhost:3000/someRouteAuth?url=";
@@ -119,6 +121,7 @@ export default class App extends Component {
 
                 <div>
                     new things -- <br /> TODO -- //delete this line <br />
+                    <MethodBox ref="method"/>
                     <GetHeaders ref="headers" />
                     <GetParams ref="params" />
                     <GetBody ref="body" />
