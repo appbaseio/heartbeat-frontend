@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import KeyValue from './keyValue.js'
+import KeyValue from './keyValue.js';
+import RaisedButton from 'material-ui/RaisedButton';
 
 
 export default class GetHeaders extends Component {
@@ -64,14 +65,10 @@ export default class GetHeaders extends Component {
 
         return(
             <div>
-            <b>Enter Headers:</b><br />
                 {pairs}
-                <button className = "btn btn-sm btn-primary" onClick = {this.addNew}>
-                    Add new
-                </button>
-                <button className = "btn btn-sm btn-primary" onClick = {this.showState}>
-                    Show State
-                </button>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                    <RaisedButton label="Add New" primary={true} onClick = {this.addNew} />
+                </MuiThemeProvider>
             </div>
         );
     };

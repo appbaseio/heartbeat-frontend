@@ -23,7 +23,6 @@ export default class GetHeaders extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField
                 onChange = {this.handleStateChange}
-                  hintText="Enter Body"
                   floatingLabelText="BODY"
                   style={{minWidth:600}}
                   value = {this.state.key}

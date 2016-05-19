@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import TextField from 'material-ui/TextField';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import RaisedButton from 'material-ui/RaisedButton';
 
 export default class KeyValue extends Component {
     state = {
@@ -54,9 +55,9 @@ export default class KeyValue extends Component {
                       onChange = {vc}
                     />
                 </MuiThemeProvider>
-                <button className = "btn btn-sm btn-danger" onClick = {this.handleDelete}>
-                    Delete
-                </button>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                    <RaisedButton label="Delete" secondary={true} onClick = {this.handleDelete} />
+                </MuiThemeProvider>
             </div>
         );
     };

@@ -17,14 +17,14 @@ export default class MethodBox extends React.Component {
     }
     render(){
         return(
-            <div>
+            <span style={{paddingBottom : -5}}>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <SelectField value={this.state.method} onChange={this.handleChange}>
+                    <SelectField value={this.state.method} onChange={this.handleChange} style={{maxWidth:100}}>
                       <MenuItem value={"GET"} primaryText="GET" />
                       <MenuItem value={"POST"} primaryText="POST" />
                     </SelectField>
                 </MuiThemeProvider>
-            </div>
+            </span>
         );
     };
 
