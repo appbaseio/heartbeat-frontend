@@ -12,19 +12,20 @@ export default class MethodBox extends React.Component {
         method: "GET"
     };
 
-    handleChange = (event, index, value) => {
-        this.setState({"method" : value});
+    handleChange = (e) => {
+        this.setState({"method" : e.target.value});
     }
+
     render(){
         return(
-            <div>
-                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <SelectField value={this.state.method} onChange={this.handleChange}>
-                      <MenuItem value={"GET"} primaryText="GET" />
-                      <MenuItem value={"POST"} primaryText="POST" />
-                    </SelectField>
-                </MuiThemeProvider>
-            </div>
+            <span className = "navbar-form" style={{marginLeft:-15}}>
+                <span className="form-group">
+                    <select className="form-control input-md" id="sel1" style = {{maxWidth:100, cursor:"poiner"}} onChange={this.handleChange}>
+                    <option>GET</option>
+                    <option>POST</option>
+                  </select>
+                </span>
+            </span>
         );
     };
 

@@ -10,14 +10,19 @@ import GetParams from './getParams.js';
 import GetBody from './getBody.js';
 import GetAuthDetails from './getAuthDetails.js';
 import MethodBox from './methodBox.js';
+Prism = require('prismjs');
 
 export default class App extends Component {
+
 
     state = {
         restApiUrl : "",
         data : "",
         changedNum: 0,
-        body : ""
+        body : "",
+        exportCode : "",
+        highlightedExportCode : "",
+        highlightedData : ""
     };
 
     handleUrlChange = (e) => {
@@ -49,6 +54,29 @@ export default class App extends Component {
             }
         };
 
+        //displaying the export data
+        var exportCode = '<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+            url: 'https://scalr.api.appbase.io',\n\
+            appname: config.appname,\n\
+            username: config.username,\n\
+            password: config.password\n\});" + "\n" + "var requestObject = {\n\
+            type: config.type,\n\
+            body: {\n\
+                query: {\n\
+                    match_all: {}\n\
+                }\n\
+            }\n\};" + "\n" + "appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
+            console.log('Use the stream object.')\n\
+        }).on('error', function(error) {\n\
+            console.log('Error handling code');\n\});";
+
+
+
+        var temp = this.state;
+        temp.exportCode = exportCode;
+        temp.highlightedExportCode = Prism.highlight(exportCode, Prism.languages.js);
+        this.setState(temp)
+
         //to use inside the callback of searchStream
         var a = this.state;
         var f = this.setState;
@@ -57,8 +85,9 @@ export default class App extends Component {
         appbaseRef.searchStream(requestObject).on('data', function(stream) {
             //displaying the updated json data
             var temp = self.state;
-            temp.data = JSON.stringify(stream._source);
+            temp.data = JSON.stringify(stream._source, null, 4);
             temp.changedNum = temp.changedNum + 1;
+            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
             self.setState(temp);
         }).on('error', function(error) {
             console.log("Query error: ", JSON.stringify(error))
@@ -105,43 +134,78 @@ export default class App extends Component {
 
     render() {
         return (
-            <div>
-                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <TextField
-                      hintText="API url here :)"
-                      floatingLabelText="Type the REST API url here"
-                      style={{minWidth:400}}
-                      value = {this.state.restApiUrl}
-                      onChange = {this.handleUrlChange}
-                    />
-                </MuiThemeProvider>
-                &nbsp;
-                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <RaisedButton label="Go!" primary={true} onClick={this.submitAndGetType} />
-                </MuiThemeProvider>
-                <br />
+            <div className = "container">
+                <div className = "row">
+                    <div className = "col-sm-7">
+                        <div className="container-fluid">
+                            <MethodBox ref="method" />&nbsp;
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                <TextField
+                                  hintText="API url here :)"
+                                  floatingLabelText="Type the REST API url here"
+                                  style={{minWidth:300}}
+                                  value = {this.state.restApiUrl}
+                                  onChange = {this.handleUrlChange}
+                                />
+                            </MuiThemeProvider>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                <RaisedButton label="Go!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:15}}/>
+                            </MuiThemeProvider>
+                            <ul className="nav nav-tabs">
+                                <li><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                <li><a data-toggle="tab" href="#auth">Auth</a></li>
+                                <li><a data-toggle="tab" href="#headers">Headers</a></li>
+                                <li><a data-toggle="tab" href="#body">Body</a></li>
+                            </ul>
+                            <div className="tab-content">
+                                <div id="params" className="tab-pane fade in active">
+                                    <h3>URL Parameters</h3>
+                                    <GetParams ref="params" />
+                                </div>
+                                <div id="auth" className="tab-pane fade">
+                                    <h3>Auth Details</h3>
+                                    <GetAuthDetails ref = "authDetails" />
+                                </div>
+                                <div id="headers" className="tab-pane fade">
+                                    <h3>Headers</h3>
+                                    <GetHeaders ref="headers" />
+                                </div>
+                                <div id="body" className="tab-pane fade">
+                                    <h3>Body</h3>
+                                    <GetBody ref="body" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className = "col-sm-5">
+                        <div className = "container-fluid">
+                            <ul className="nav nav-tabs">
+                                <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
+                                <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
+                            </ul>
+                            <div className="tab-content">
+                                <div id="response" className="tab-pane fade in active">
+                                    <div className = "well" style={{marginTop:60}}>
+                                        JSON Response:<br /><br />
+                                        <pre>
+                                            <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                                            </code>
+                                        </pre>
+                                    Your JSON changed: &nbsp;
+                                    {this.state.changedNum} times.
+                                    </div>
+                                </div>
+                                <div id="exportCode" className="tab-pane fade">
+                                    <pre>
+                                        <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
+                                        </code>
+                                    </pre>
+                                </div>
+                            </div>
 
-                <div>
-                    Your JSON changed:&nbsp;
-                    {this.state.changedNum} times.
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    Your JSON:<br />
-                    {this.state.data}
-                </div>
-
-                <div>
-                    <br /><br />
-                    <MethodBox ref="method"/>
-                    <GetHeaders ref="headers" />
-                    <GetParams ref="params" />
-                    <GetBody ref="body" />
-                </div>
-
-                <div>
-                    <GetAuthDetails ref = "authDetails" />
-                </div>
-
             </div>
         );
     }
