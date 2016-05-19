@@ -56,7 +56,7 @@ export default class KeyValue extends Component {
                     />
                 </MuiThemeProvider>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <RaisedButton label="Delete" secondary={true} onClick = {this.handleDelete} />
+                    <RaisedButton label="Delete" secondary={true} onClick = {this.handleDelete}/>
                 </MuiThemeProvider>
             </div>
         );

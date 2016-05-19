@@ -8,15 +8,19 @@ import GetParams from './getParams.js';
 import GetBody from './getBody.js';
 import GetAuthDetails from './getAuthDetails.js';
 import MethodBox from './methodBox.js';
+Prism = require('prismjs');
 
 export default class App extends Component {
+
 
     state = {
         restApiUrl : "",
         data : "",
         changedNum: 0,
         body : "",
-        exportCode : ""
+        exportCode : "",
+        highlightedExportCode : "",
+        highlightedData : ""
     };
 
     handleUrlChange = (e) => {
@@ -49,27 +53,26 @@ export default class App extends Component {
         };
 
         //displaying the export data
-        var exportCode = '<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config) + ";\n" + "var appbaseRef = new Appbase({\n\
+        var exportCode = '<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
             url: 'https://scalr.api.appbase.io',\n\
             appname: config.appname,\n\
             username: config.username,\n\
-            password: config.password\n\
-        });" + "\n" + "var requestObject = {\n\
+            password: config.password\n\});" + "\n" + "var requestObject = {\n\
             type: config.type,\n\
             body: {\n\
                 query: {\n\
                     match_all: {}\n\
                 }\n\
-            }\n\
-        };" + "\n" + "appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
+            }\n\};" + "\n" + "appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
             console.log('Use the stream object.')\n\
         }).on('error', function(error) {\n\
-            console.log('Error handling code');\n\
-        });"
+            console.log('Error handling code');\n\});";
+
 
 
         var temp = this.state;
         temp.exportCode = exportCode;
+        temp.highlightedExportCode = Prism.highlight(exportCode, Prism.languages.js);
         this.setState(temp)
 
         //to use inside the callback of searchStream
@@ -80,8 +83,9 @@ export default class App extends Component {
         appbaseRef.searchStream(requestObject).on('data', function(stream) {
             //displaying the updated json data
             var temp = self.state;
-            temp.data = JSON.stringify(stream._source);
+            temp.data = JSON.stringify(stream._source, null, 4);
             temp.changedNum = temp.changedNum + 1;
+            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
             self.setState(temp);
         }).on('error', function(error) {
             console.log("Query error: ", JSON.stringify(error))
@@ -137,7 +141,7 @@ export default class App extends Component {
                                 <TextField
                                   hintText="API url here :)"
                                   floatingLabelText="Type the REST API url here"
-                                  style={{minWidth:400}}
+                                  style={{minWidth:300}}
                                   value = {this.state.restApiUrl}
                                   onChange = {this.handleUrlChange}
                                 />
@@ -146,27 +150,13 @@ export default class App extends Component {
                                 <RaisedButton label="Go!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:15}}/>
                             </MuiThemeProvider>
                             <ul className="nav nav-tabs">
-                                <li className="active"><a data-toggle="tab" href="#urlAndInterval">URL</a></li>
-                                <li><a data-toggle="tab" href="#params">Params</a></li>
+                                <li><a data-toggle="tab" href="#params" className="active">Params</a></li>
                                 <li><a data-toggle="tab" href="#auth">Auth</a></li>
                                 <li><a data-toggle="tab" href="#headers">Headers</a></li>
                                 <li><a data-toggle="tab" href="#body">Body</a></li>
                             </ul>
                             <div className="tab-content">
-                                <div id="urlAndInterval" className="tab-pane fade in active">
-                                    <h3>Enter the url and the polling interval</h3>
-
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <TextField
-                                          hintText="API url here :)"
-                                          floatingLabelText="Type the REST API url here"
-                                          style={{minWidth:400}}
-                                          value = {this.state.restApiUrl}
-                                          onChange = {this.handleUrlChange}
-                                        />
-                                    </MuiThemeProvider>
-                                </div>
-                                <div id="params" className="tab-pane fade">
+                                <div id="params" className="tab-pane fade in active">
                                     <h3>URL Parameters</h3>
                                     <GetParams ref="params" />
                                 </div>
@@ -196,8 +186,7 @@ export default class App extends Component {
                                     <div className = "well" style={{marginTop:60}}>
                                         JSON Response:<br /><br />
                                         <pre>
-                                            <code className="javascript">
-                                                {this.state.data}
+                                            <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
                                             </code>
                                         </pre>
                                     Your JSON changed: &nbsp;
@@ -206,8 +195,7 @@ export default class App extends Component {
                                 </div>
                                 <div id="exportCode" className="tab-pane fade">
                                     <pre>
-                                        <code style={{fontSize:"20%"}}>
-                                            {this.state.exportCode}
+                                        <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
                                         </code>
                                     </pre>
                                 </div>
