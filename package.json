@@ -29,7 +29,8 @@
     "react-dom": "^15.0.0",
     "babel-runtime": "^6.3.19",
     "prismjs": "~1.5.0",
-    "js-beautify": "~1.6.2"
+    "js-beautify": "~1.6.2",
+    "request": "~2.72.0"
   },
   "devDependencies": {
     "babel-core": "^6.3.21",

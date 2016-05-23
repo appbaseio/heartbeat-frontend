@@ -8,7 +8,9 @@ import GetParams from './getParams.js';
 import GetBody from './getBody.js';
 import GetAuthDetails from './getAuthDetails.js';
 import MethodBox from './methodBox.js';
+import PollingInterval from './pollingInterval.js'
 Prism = require('prismjs');
+var makePollerRequestObject = require('./pollerRequestObject.js')
 
 export default class App extends Component {
 
@@ -102,7 +104,8 @@ export default class App extends Component {
             body : this.refs.body.state,
             params : this.refs.params.state,
             authDetails : this.refs.authDetails.state,
-            method : this.refs.method.state.method
+            method : this.refs.method.state.method,
+            pollingInterval : this.refs.pollingInterval.state.pollingInterval
         };
         var config = {
             appname: 'jsfiddle-demo',
@@ -121,6 +124,29 @@ export default class App extends Component {
             body: objectToIndex,
             id: currentTime,
         };
+
+        //TODO
+        ////////////////////////////////////////////////////////////////////////making ajax request and seeing the result
+        // var pollerRequestObject = makePollerRequestObject(objectToIndex);
+        // pollerRequestObject["success"] = function(res){
+        //     console.log(res);
+        // };
+        // // pollerRequestObject["error"] = function(jqXHR, textStatus, errorThrown) {
+        // //     console.log('Error: '+jqXHR.status);
+        // //     console.log('textStatus: '+textStatus)
+        // // }
+        // $.ajaxSetup({
+        //     crossDomain: true,
+        //     xhrFields: {
+        //         withCredentials: true
+    	// 	}
+    	// });
+        // $.ajax(pollerRequestObject);
+        // console.log(pollerRequestObject);
+        // return;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
         var streamAndUpdate = this.streamAndUpdate;
         appbaseRef.index(requestObject).on('data', function(response) {
             console.log("successfully indexed.");
@@ -134,7 +160,7 @@ export default class App extends Component {
         return (
             <div className = "container">
                 <div className = "row">
-                    <div className = "col-sm-7">
+                    <div className = "col-sm-8">
                         <div className="container-fluid">
                             <MethodBox ref="method" />&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -146,6 +172,8 @@ export default class App extends Component {
                                   onChange = {this.handleUrlChange}
                                 />
                             </MuiThemeProvider>
+                            &nbsp;&nbsp;&nbsp;
+                            <PollingInterval ref = "pollingInterval" />
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                 <RaisedButton label="Go!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:15}}/>
                             </MuiThemeProvider>
@@ -175,7 +203,7 @@ export default class App extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className = "col-sm-5">
+                    <div className = "col-sm-4">
                         <div className = "container-fluid">
                             <ul className="nav nav-tabs">
                                 <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
