@@ -23,7 +23,8 @@ export default class App extends Component {
         body : "",
         exportCode : "",
         highlightedExportCode : "Nothing to export.",
-        highlightedData : "Nothing streamed yet."
+        highlightedData : "Nothing streamed yet.",
+        loadedFirstTime: true
     };
 
     handleUrlChange = (e) => {
@@ -145,7 +146,7 @@ export default class App extends Component {
         // $.ajax(pollerRequestObject);
         // console.log(pollerRequestObject);
         // return;
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         var streamAndUpdate = this.streamAndUpdate;
@@ -157,6 +158,7 @@ export default class App extends Component {
         });
     };
 
+
     render() {
         return (
             <div>
@@ -165,6 +167,8 @@ export default class App extends Component {
                 </div>
                 <div className = "container-fluid">
                     <div className="side-body">
+                        <div className = "row">
+                        </div>
                         <div className = "row">
                             <div className = "col-sm-7">
                                 <div className="container-fluid">
@@ -190,7 +194,7 @@ export default class App extends Component {
                                     <br /><br />
                                     <div className="well lightWell">
                                         <ul className="nav nav-tabs">
-                                            <li><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                            <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
                                             <li><a data-toggle="tab" href="#auth">Auth</a></li>
                                             <li><a data-toggle="tab" href="#headers">Headers</a></li>
                                             <li><a data-toggle="tab" href="#body">Body</a></li>
@@ -243,7 +247,6 @@ export default class App extends Component {
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
