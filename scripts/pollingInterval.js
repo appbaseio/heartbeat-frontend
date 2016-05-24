@@ -7,7 +7,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 export default class PollingInterval extends Component {
 
     state = {
-        pollingInterval : ""
+        pollingInterval : "5"
     };
 
     handleStateChange = (e) => {

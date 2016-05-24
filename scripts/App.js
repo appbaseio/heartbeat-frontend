@@ -168,38 +168,32 @@ export default class App extends Component {
                 <div className = "container-fluid">
                     <div className="side-body">
                         <div className = "row">
+                            <MethodBox ref="method" />&nbsp;
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                <TextField
+                                  hintText="API url here :)"
+                                  floatingLabelText="Type the REST API url here"
+                                  style={{minWidth:'74%', maxWidth:'76%'}}
+                                  value = {this.state.restApiUrl}
+                                  onChange = {this.handleUrlChange}
+                                />
+                            </MuiThemeProvider>
+                            &nbsp;&nbsp;&nbsp;
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                            <RaisedButton label="Go!" secondary={true} style={{marginTop:5}}/>
+                            </MuiThemeProvider>
                         </div>
                         <div className = "row">
                             <div className = "col-sm-7">
                                 <div className="container-fluid">
-                                    <MethodBox ref="method" />&nbsp;
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <TextField
-                                          hintText="API url here :)"
-                                          floatingLabelText="Type the REST API url here"
-                                          style={{minWidth:300}}
-                                          value = {this.state.restApiUrl}
-                                          onChange = {this.handleUrlChange}
-                                        />
-                                    </MuiThemeProvider>
-                                    &nbsp;&nbsp;&nbsp;
-                                    <PollingInterval ref = "pollingInterval" />
-                                    <br /><br />
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <RaisedButton label="Check the request" secondary={true} style={{marginTop:5}}/>
-                                    </MuiThemeProvider>
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <RaisedButton label="Go!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:10, marginTop:5}}/>
-                                    </MuiThemeProvider>
-                                    <br /><br />
-                                    <div className="well lightWell">
+                                    <div style={{marginTop:25}}>
                                         <ul className="nav nav-tabs">
                                             <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
                                             <li><a data-toggle="tab" href="#auth">Auth</a></li>
                                             <li><a data-toggle="tab" href="#headers">Headers</a></li>
                                             <li><a data-toggle="tab" href="#body">Body</a></li>
                                         </ul>
-                                        <div className="tab-content">
+                                        <div className="tab-content well lightWell" style={{marginTop:25}}>
                                             <div id="params" className="tab-pane fade in active">
                                                 <h3>URL Parameters</h3>
                                                 <GetParams ref="params" />
@@ -220,7 +214,7 @@ export default class App extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className = "col-sm-5">
+                            <div className = "col-sm-4">
                                 <div className = "container-fluid" style={{marginTop:25}}>
                                     <ul className="nav nav-tabs">
                                         <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
@@ -228,18 +222,23 @@ export default class App extends Component {
                                     </ul>
                                     <div className="tab-content">
                                         <div id="response" className="tab-pane fade in active">
-                                            <div className = "well" style={{marginTop:85}}>
-                                                JSON Response:<br /><br />
-                                                <pre>
+                                            <PollingInterval ref = "pollingInterval" />
+                                            &nbsp;&nbsp;&nbsp;
+                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <RaisedButton label="Stream it!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:0, marginTop:5}}/>
+                                            </MuiThemeProvider>
+                                            <div className = "well" style={{marginTop:25}}>
+                                                Your JSON changed: &nbsp;
+                                                <b>{this.state.changedNum}</b> times.<br /><br />
+                                                JSON Response:<br />
+                                                <pre style={{marginTop:10}}>
                                                     <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
                                                     </code>
                                                 </pre>
-                                            Your JSON changed: &nbsp;
-                                            {this.state.changedNum} times.
                                             </div>
                                         </div>
                                         <div id="exportCode" className="tab-pane fade">
-                                            <div style={{marginTop:85}}>
+                                            <div style={{marginTop:25}}>
                                                 <pre>
                                                     <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
                                                     </code>
