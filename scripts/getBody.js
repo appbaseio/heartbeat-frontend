@@ -24,7 +24,7 @@ export default class GetHeaders extends Component {
                 <TextField
                 onChange = {this.handleStateChange}
                   floatingLabelText="BODY"
-                  style={{minWidth:600}}
+                  style={{minWidth:450}}
                   value = {this.state.key}
                   multiLine = {true}
                   rows = {2}
