@@ -6,6 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import GetHeaders from './getHeaders.js';
 import GetParams from './getParams.js';
 import GetBody from './getBody.js';
+import GetTitle from './getTitle.js';
 import GetAuthDetails from './getAuthDetails.js';
 import MethodBox from './methodBox.js';
 import PollingInterval from './pollingInterval.js'
@@ -15,7 +16,6 @@ var makePollerRequestObject = require('./pollerRequestObject.js');
 
 export default class App extends Component {
 
-
     state = {
         restApiUrl : "",
         data : "",
@@ -24,7 +24,10 @@ export default class App extends Component {
         exportCode : "",
         highlightedExportCode : "Nothing to export.",
         highlightedData : "Nothing streamed yet.",
-        loadedFirstTime: true
+        loadedFirstTime: true,
+        isNew: true,
+        currentType : "addnew",
+        currentStream : null
     };
 
     handleUrlChange = (e) => {
@@ -34,10 +37,11 @@ export default class App extends Component {
     };
 
     streamAndUpdate = (type) => {
+        console.log(type);
         var config = {
-            appname: 'jsfiddle-demo',
-            username: '7eJWHfD4P',
-            password: '431d9cea-5219-4dfb-b798-f897f3a02665',
+            appname: this.refs.sidebar.state.app_name,
+            username: this.refs.sidebar.state.credentials.write.split(':')[0],
+            password: this.refs.sidebar.state.credentials.write.split(':')[1],
             type: type
         };
         var appbaseRef = new Appbase({
@@ -84,7 +88,7 @@ export default class App extends Component {
         var f = this.setState;
         var self = this;
 
-        appbaseRef.searchStream(requestObject).on('data', function(stream) {
+        var currentStream = appbaseRef.searchStream(requestObject).on('data', function(stream) {
             //displaying the updated json data
             var temp = self.state;
             temp.data = JSON.stringify(stream._source, null, 4);
@@ -95,78 +99,169 @@ export default class App extends Component {
             console.log("Query error: ", JSON.stringify(error))
         });
 
+        var temp = this.state;
+        temp.currentStream = currentStream;
+        this.setState(temp);
+
     };
 
     submitAndGetType = () => {
-        var currentTime = new Date().getTime().toString();
-        var objectToIndex = {
-            restApiUrl : this.state.restApiUrl,
-            type : currentTime,
-            headers : this.refs.headers.state,
-            body : this.refs.body.state,
-            params : this.refs.params.state,
-            authDetails : this.refs.authDetails.state,
-            method : this.refs.method.state.method,
-            pollingInterval : this.refs.pollingInterval.state.pollingInterval
-        };
-        var config = {
-            appname: 'jsfiddle-demo',
-            username: '7eJWHfD4P',
-            password: '431d9cea-5219-4dfb-b798-f897f3a02665',
-            type: "pollRequests"
-        };
-        var appbaseRef = new Appbase({
-            url: 'https://scalr.api.appbase.io',
-            appname: config.appname,
-            username: config.username,
-            password: config.password
-        });
-        var requestObject = {
-            type: config.type,
-            body: objectToIndex,
-            id: currentTime,
-        };
+        if (this.state.isNew){
+            var currentTime = new Date().getTime().toString();
+            var objectToIndex = {
+                restApiUrl : this.state.restApiUrl,
+                type : currentTime,
+                headers : this.refs.headers.state,
+                body : this.refs.body.state,
+                params : this.refs.params.state,
+                authDetails : this.refs.authDetails.state,
+                method : this.refs.method.state.method,
+                pollingInterval : this.refs.pollingInterval.state.pollingInterval,
+                title : this.refs.title.state.data,
+                credentials : this.refs.sidebar.state.credentials,
+                appName : this.refs.sidebar.state.app_name
+                // isNew : false
+            };
+            var config = {
+                appname: 'jsfiddle-demo',
+                username: '7eJWHfD4P',
+                password: '431d9cea-5219-4dfb-b798-f897f3a02665',
+                type: "pollRequests"
+            };
+            var appbaseRef = new Appbase({
+                url: 'https://scalr.api.appbase.io',
+                appname: config.appname,
+                username: config.username,
+                password: config.password
+            });
+            var requestObject = {
+                type: config.type,
+                body: objectToIndex,
+                id: currentTime,
+            };
 
-        //TODO
-        ////////////////////////////////////////////////////////////////////////making ajax request and seeing the result
-        // var pollerRequestObject = makePollerRequestObject(objectToIndex);
-        // pollerRequestObject["success"] = function(res){
-        //     console.log(res);
-        // };
-        // // pollerRequestObject["error"] = function(jqXHR, textStatus, errorThrown) {
-        // //     console.log('Error: '+jqXHR.status);
-        // //     console.log('textStatus: '+textStatus)
-        // // }
-        // $.ajaxSetup({
-        //     crossDomain: true,
-        //     xhrFields: {
-        //         withCredentials: true
-    	// 	}
-    	// });
-        // $.ajax(pollerRequestObject);
-        // console.log(pollerRequestObject);
-        // return;
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            var streamAndUpdate = this.streamAndUpdate;
+            var self = this;
+            appbaseRef.index(requestObject).on('data', function(response) {
+                console.log("successfully indexed.");
+                var config = {
+                    appname: self.refs.sidebar.state.app_name,
+                    username: self.refs.sidebar.state.credentials.write.split(':')[0],
+                    password: self.refs.sidebar.state.credentials.write.split(':')[1],
+                    type: currentTime
+                };
+                var appbaseRef = new Appbase({
+                    url: 'https://scalr.api.appbase.io',
+                    appname: config.appname,
+                    username: config.username,
+                    password: config.password
+                });
+                var requestObject = {
+                    type: config.type,
+                    id: 'Element2', // it will have the title
+                    body: objectToIndex
+                };
+                appbaseRef.index(requestObject).on('data',function(res){
+                    streamAndUpdate(currentTime);
+                    console.log(res);
+                }).on('error', function(err){
+                    console.log(err);
+                })
+            }).on('error', function(error) {
+                console.log("error in indexing.");
+            });
+            //changing in the side bar
+            var temp = this.refs.sidebar.state;
+            temp.types[temp.types.length] = [currentTime, this.refs.title.state.data];
+            this.refs.sidebar.setState(temp);
+        }else{
+            //just start streaming
+            this.streamAndUpdate(this.state.currentType);
 
-
-        var streamAndUpdate = this.streamAndUpdate;
-        appbaseRef.index(requestObject).on('data', function(response) {
-            console.log("successfully indexed.");
-            streamAndUpdate(currentTime);
-        }).on('error', function(error) {
-            console.log("error in indexing.");
-        });
+        }
     };
 
+    changeTheContent = (type) => {
+        var self = this;
+        if (type == "addnew") {
+            $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
+            self.refs.title.setState({data: ""});
+            self.refs.authDetails.setState({username:"",password:""});
+            self.refs.body.setState({data:"",type:""});
+            self.refs.method.setState({method: "GET"});
+            self.refs.pollingInterval.setState({pollingInterval: 5});
+            self.refs.headers.setState({keyValuePairs : []}); //TODO -these both not working
+            self.refs.params.setState({keyValuePairs : []});
+            var temp = self.state;
+            temp.restApiUrl = "";
+            temp.exportCode = "";
+            temp.data = "";
+            temp.changedNum = 0;
+            temp.isNew = true;
+            temp.currentType = type;
+            temp.highlightedExportCode = "Nothing to export.";
+            temp.highlightedData = "Nothing streamed yet.";
+            self.setState(temp);
+            if(self.state.currentStream!=null){self.state.currentStream.stop();}
+        }else{
+            $('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
+            var config = {
+                appname: this.refs.sidebar.state.app_name,
+                username: this.refs.sidebar.state.credentials.write.split(':')[0],
+                password: this.refs.sidebar.state.credentials.write.split(':')[1],
+                type: type
+            };
+            var appbaseRef = new Appbase({
+                url: 'https://scalr.api.appbase.io',
+                appname: config.appname,
+                username: config.username,
+                password: config.password
+            });
+            var requestObject = {
+                type: config.type,
+                id: 'Element2'
+            };
+            appbaseRef.get(requestObject).on('data', function(res) {
+                // console.log('here');
+                //res._source wapro
+                var obj = res._source;
+                console.log(res);
+                console.log(config);
+                self.refs.title.setState({data: obj.title});
+                self.refs.authDetails.setState(obj.authDetails);
+                self.refs.body.setState(obj.body);
+                self.refs.method.setState({method: obj.method});
+                self.refs.pollingInterval.setState({pollingInterval: obj.pollingInterval});
+                self.refs.headers.setState(obj.headers); //TODO -these both not working
+                self.refs.params.setState(obj.params);
+                var temp = self.state;
+                temp.restApiUrl = obj.restApiUrl;
+                temp.exportCode = "";
+                temp.data = "";
+                temp.changedNum = 0;
+                temp.isNew = false;
+                temp.currentType = type;
+                temp.highlightedExportCode = "Nothing to export.";
+                temp.highlightedData = "Nothing streamed yet.";
+                self.setState(temp);
+                if(self.state.currentStream!=null){self.state.currentStream.stop();}
+            }).on('error', function(err) {
+                console.log("getTypes() failed: ", err);
+            });
+        } // else over here
+    }
 
     render() {
         return (
             <div>
                 <div>
-                    <SideBar />
+                    <SideBar changeTheContent={this.changeTheContent} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
                     <div className="side-body">
+                        <div className="row lightWell well" style={{marginTop:5}}>
+                            <center><GetTitle ref="title" /></center>
+                        </div>
                         <div className = "row">
                             <MethodBox ref="method" />&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
@@ -227,7 +322,7 @@ export default class App extends Component {
                                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                                 <RaisedButton label="Stream it!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:0, marginTop:5}}/>
                                             </MuiThemeProvider>
-                                            <div className = "well" style={{marginTop:25}}>
+                                            <div className = "well" style={{marginTop:10}}>
                                                 Your JSON changed: &nbsp;
                                                 <b>{this.state.changedNum}</b> times.<br /><br />
                                                 JSON Response:<br />
@@ -251,6 +346,8 @@ export default class App extends Component {
                         </div>
                     </div>
                 </div>
+                <div id='toastMessageAddNew' style={{display:'none'}}>Add new details now!</div>
+                <div id='streamItToast' style={{display:'none'}}>Click on stream it to watch the stream!</div>
             </div>
         );
     }

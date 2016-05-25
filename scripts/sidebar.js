@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-
 export default class SideBar extends Component {
 
     state = {
-
+        app_name : "",
+        credentials : {},
+        types: []
     };
 
     // create the app
@@ -25,8 +26,10 @@ export default class SideBar extends Component {
 
     // get the read credentials of app
     permission = (app_id, method, app_name) => {
+        var self = this;
         if (method == 'read') {
             $.ajax({
+                async: false,
                 type: "GET",
                 url: 'https://accapi.appbase.io/app/' + app_id + '/permissions',
                 success: function(full_data) {
@@ -47,13 +50,22 @@ export default class SideBar extends Component {
                         'permission': permission_credentials
                     };
                     var final_snippet = final_data.app_name + ':' + final_data.permission.write + ':' + final_data.permission.read;
-                    console.log(final_data);
+
+                    //setting this data in the state
+                    var temp = self.state;
+                    temp.app_name = final_data.app_name;
+                    temp.credentials = final_data.permission;
+                    self.setState(temp);
+                    // console.log(self.state);
+                    self.getAndSetTypes();
+
                     // $('.code_snippet').text(final_snippet);
                     // $('.loading').hide();
                 }
             });
         } else if (method == 'write') {
             $.ajax({
+                async: false,
                 type: "POST",
                 url: 'https://accapi.appbase.io/app/' + app_id + '/permissions',
                 dataType: 'json',
@@ -63,13 +75,13 @@ export default class SideBar extends Component {
                     "write": false
                 }),
                 success: function(full_data) {
-                    permission(app_id, 'read', app_name);
+                    self.permission(app_id, 'read', app_name);
                 }
             });
         }
     }
 
-    componentWilllMount(){
+    componentDidMount(){
         var r2s_creation = this.r2s_creation;
         var permission = this.permission;
         $.ajaxSetup({
@@ -113,13 +125,80 @@ export default class SideBar extends Component {
                 }
             },
             error: function() {
+                console.log("error lolo");
                 return;
                 // window.location.href = "index.html"; // do smething here
             }
         });
     };
 
+    getAndSetTypes = () => {
+        //get the types and set them into the State
+        var configForTypes = {
+            appname: this.state.app_name,
+            username: this.state.credentials.write.split(':')[0],
+            password: this.state.credentials.write.split(':')[1]
+        };
+        var appbaseRef = new Appbase({
+            url: 'https://scalr.api.appbase.io',
+            appname: configForTypes.appname,
+            username: configForTypes.username,
+            password: configForTypes.password
+        });
+
+        var self = this;
+        appbaseRef.getTypes().on('data', function(res) {
+            // console.log("All app types: ", res);
+            var temp = self.state;
+            //temp.types = res;
+            self.setState(temp);
+            self.render();
+            // console.log("this is res");
+            // console.log(res);
+            res.map(function(type){
+                if (type != ".percolator" && type != "~logs"){
+                    configForTypes['type'] = type;
+                    var requestObject = {
+                        id : "Element2",
+                        type : type
+                    };
+                    appbaseRef.get(requestObject).on('data', function(res){
+                        // console.log(res);
+                        if(res.found){
+                            var temp = self.state;
+                            temp.types[temp.types.length] = [type, res._source.title]
+                            self.setState(temp);
+                            // console.log(self.state);
+                            // console.log(JSON.stringify(res._source));
+                            console.log([type, res._source.title]);
+                        }
+                    }).on('error', function(err){
+                        console.log(err);
+                    });
+                }
+            });
+            res.map(function(type){
+
+            });
+        }).on('error', function(err) {
+            console.log("getTypes() failed: ", err);
+        });
+    }
+
     render(){
+        var typesLI = [];
+        var self = this;
+        typesLI = this.state.types.map(function(tuple){
+            if (tuple[0] != ".percolator" && tuple[0] != "~logs"){
+                return(
+                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, tuple[0])}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">&nbsp;&nbsp;{tuple[1]}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+                );
+            }
+            //nbsp dala h for the hrs coming ine by line
+        });
+        // console.log(typesLI);
+        typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+
         return(
             <div>
                 <div className="side-menu">
@@ -142,10 +221,7 @@ export default class SideBar extends Component {
 
                         <div className="side-menu-container">
                             <ul className="nav navbar-nav">
-                                <li className="sidebarLI"><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">123246542321</span></a></li>
-                                <li className="sidebarLI"><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">1321123554132</span></a></li>
-                                <li className="sidebarLI"><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">11216542123215</span></a></li>
-                                <li className="sidebarLI"><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">15461232133512</span></a></li>
+                                {typesLI}
                             </ul>
                         </div>
                     </nav>
