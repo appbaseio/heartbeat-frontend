@@ -4,11 +4,10 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 
-export default class GetBody extends Component {
+export default class GetTitle extends Component {
 
     state = {
-        data : "",
-        type : ""
+        data : ""
     };
 
     handleStateChange = (e) => {
@@ -23,12 +22,14 @@ export default class GetBody extends Component {
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField
                 onChange = {this.handleStateChange}
-                  floatingLabelText="BODY"
+                  floatingLabelText="Name this awesome stream!"
                   style={{minWidth:450}}
                   value = {this.state.data}
-                  multiLine = {true}
-                  rows = {2}
-                  rowsMax = {100}
+                  floatingLabelStyle = {{
+                      fontSize:'200%',
+                      color:'#00BFFF'
+                  }}
+                  floatingLabelFixed = {true}
                 />
             </MuiThemeProvider>
         );
