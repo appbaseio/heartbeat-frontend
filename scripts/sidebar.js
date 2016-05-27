@@ -188,6 +188,7 @@ export default class SideBar extends Component {
     render(){
         var typesLI = [];
         var self = this;
+        //typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
         typesLI = this.state.types.map(function(tuple){
             if (tuple[0] != ".percolator" && tuple[0] != "~logs"){
                 return(
@@ -198,6 +199,7 @@ export default class SideBar extends Component {
         });
         // console.log(typesLI);
         typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        typesLI.reverse();
 
         return(
             <div>

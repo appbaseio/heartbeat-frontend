@@ -53,7 +53,7 @@
 }
 .side-menu {
   position: fixed;
-  width: 300px;
+  width: 200px;
   height: 100%;
   background-color: #f8f8f8;
   border-right: 1px solid #e7e7e7;
@@ -177,7 +177,7 @@
 }
 /* Main body section */
 .side-body {
-  margin-left: 310px;
+  margin-left: 200px;
 }
 /* small screen */
 @media (max-width: 768px) {
@@ -254,7 +254,7 @@
     /* Add position:absolute for scrollable menu -> see top comment */
     position: fixed;
     left: -300px;
-    width: 300px;
+    width: 200px;
     top: 43px;
     height: 100%;
     border-right: 1px solid #e7e7e7;

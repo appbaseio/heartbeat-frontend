@@ -33,9 +33,15 @@ export default class App extends Component {
     };
 
     handleUrlChange = (e) => {
+        var flag = this.refs.title.state.data == this.state.restApiUrl;
         var temp = this.state;
-        temp.restApiUrl = e.target.value;
+        temp.restApiUrl = $.trim(e.target.value);
         this.setState(temp);
+        //also changing the title
+        temp = this.refs.title;
+        if(temp.state.data == "My New Awesome Stream" || flag ){
+            temp.setState({"data": $.trim(e.target.value).substring(0,30)});
+        }
     };
 
     streamAndUpdate = (type) => {
@@ -187,7 +193,7 @@ export default class App extends Component {
         var self = this;
         if (type == "addnew") {
             $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
-            self.refs.title.setState({data: ""});
+            self.refs.title.setState({data: "My New Awesome Stream"});
             self.refs.authDetails.setState({username:"",password:""});
             self.refs.body.setState({data:"",type:""});
             self.refs.method.setState({method: "GET"});
@@ -261,86 +267,83 @@ export default class App extends Component {
                 </div>
                 <div className = "container-fluid">
                     <div className="side-body">
-                        <div className="row lightWell well" style={{marginTop:5}}>
-                            <center><GetTitle ref="title" /></center>
+                        <div className="row" style={{marginTop:5}}>
+                            <GetTitle ref="title" />
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <PollingInterval ref = "pollingInterval" />
+                            <span  className="container-fluid" style={{margin:20, color:'pink', fontSize:'70%'}}><b>NOTE: </b>The Go button is disabled for now. You can can add a new request by clicking {'\'add new\''} and entering the required info. Your request will only be saved on the servers after you click on Stream It button. To stream an already existing request, click on it from the sidebar, once it loads, click on Stream it. <b>DONT MODIFY ALREADY EXISTING REQUESTS, CREATE A NEW ONE IF YOU WANT TO MAKE CHANGES, FOR NOW.</b></span>
                         </div>
-                        <div className = "row">
+                        <div className = "row" style={{marginTop:-20}}>
                             <MethodBox ref="method" />&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                 <TextField
-                                  hintText="API url here :)"
+                                  hintText="http://www.exampleAPI.com/api/getUserDetails"
                                   floatingLabelText="Type the REST API url here"
-                                  style={{minWidth:'74%', maxWidth:'76%'}}
+                                  style={{minWidth:'80%', maxWidth:'86%'}}
                                   value = {this.state.restApiUrl}
                                   onChange = {this.handleUrlChange}
                                 />
                             </MuiThemeProvider>
                             &nbsp;&nbsp;&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
-                            <RaisedButton label="Go!" secondary={true} style={{marginTop:5}}/>
+                                <RaisedButton label="Go!" secondary={true} style={{marginTop:5}} disabled={true}/>
                             </MuiThemeProvider>
                         </div>
                         <div className = "row">
-                            <div className = "col-sm-7">
-                                <div className="container-fluid">
-                                    <div style={{marginTop:25}}>
-                                        <ul className="nav nav-tabs">
-                                            <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                            <li><a data-toggle="tab" href="#auth">Auth</a></li>
-                                            <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                            <li><a data-toggle="tab" href="#body">Body</a></li>
-                                        </ul>
-                                        <div className="tab-content well lightWell" style={{marginTop:25}}>
-                                            <div id="params" className="tab-pane fade in active">
-                                                <h3>URL Parameters</h3>
-                                                <GetParams ref="params" />
-                                            </div>
-                                            <div id="auth" className="tab-pane fade">
-                                                <h3>Auth Details</h3>
-                                                <GetAuthDetails ref = "authDetails" />
-                                            </div>
-                                            <div id="headers" className="tab-pane fade">
-                                                <h3>Headers</h3>
-                                                <GetHeaders ref="headers" />
-                                            </div>
-                                            <div id="body" className="tab-pane fade">
-                                                <h3>Body</h3>
-                                                <GetBody ref="body" />
-                                            </div>
+                            <div className = "col-sm-6">
+                                <div style={{marginTop:25}}>
+                                    <ul className="nav nav-tabs">
+                                        <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                        <li><a data-toggle="tab" href="#auth">Auth</a></li>
+                                        <li><a data-toggle="tab" href="#headers">Headers</a></li>
+                                        <li><a data-toggle="tab" href="#body">Body</a></li>
+                                    </ul>
+                                    <div className="tab-content well lightWell" style={{marginTop:25}}>
+                                        <div id="params" className="tab-pane fade in active">
+                                            <h4>URL Parameters</h4>
+                                            <GetParams ref="params" />
+                                        </div>
+                                        <div id="auth" className="tab-pane fade">
+                                            <h4>Auth Details</h4>
+                                            <GetAuthDetails ref = "authDetails" />
+                                        </div>
+                                        <div id="headers" className="tab-pane fade">
+                                            <h4>Headers</h4>
+                                            <GetHeaders ref="headers" />
+                                        </div>
+                                        <div id="body" className="tab-pane fade">
+                                            <h4>Body</h4>
+                                            <GetBody ref="body" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className = "col-sm-4">
-                                <div className = "container-fluid" style={{marginTop:25}}>
-                                    <ul className="nav nav-tabs">
-                                        <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
-                                        <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
-                                    </ul>
-                                    <div className="tab-content">
-                                        <div id="response" className="tab-pane fade in active">
-                                            <PollingInterval ref = "pollingInterval" />
-                                            &nbsp;&nbsp;&nbsp;
-                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                                <RaisedButton label="Stream it!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:0, marginTop:5}}/>
-                                            </MuiThemeProvider>
-                                            <div className = "well" style={{marginTop:10}}>
-                                                Your JSON changed: &nbsp;
-                                                <b>{this.state.changedNum}</b> times.<br /><br />
-                                                JSON Response:<br />
-                                                <pre style={{marginTop:10}}>
-                                                    <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
-                                                    </code>
-                                                </pre>
-                                            </div>
+                            <div className = "col-sm-6" style={{marginTop:25}}>
+                                <ul className="nav nav-tabs">
+                                    <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
+                                    <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
+                                </ul>
+                                <div className="tab-content">
+                                    <div id="response" className="tab-pane fade in active">
+                                        {'===>'}<MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <RaisedButton label="Stream it!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:0, marginTop:10, maxWidth:100,maxHeight:50}} labelStyle={{fontSize:'80%'}}/>
+                                        </MuiThemeProvider>{'<==='}
+                                        <div className = "well" style={{marginTop:10}}>
+                                            Your JSON changed: &nbsp;
+                                            <b>{this.state.changedNum}</b> times.<br /><br />
+                                            JSON Response:<br />
+                                            <pre style={{marginTop:10}}>
+                                                <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                                                </code>
+                                            </pre>
                                         </div>
-                                        <div id="exportCode" className="tab-pane fade">
-                                            <div style={{marginTop:25}}>
-                                                <pre>
-                                                    <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
-                                                    </code>
-                                                </pre>
-                                            </div>
+                                    </div>
+                                    <div id="exportCode" className="tab-pane fade">
+                                        <div style={{marginTop:25}}>
+                                            <pre>
+                                                <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
+                                                </code>
+                                            </pre>
                                         </div>
                                     </div>
                                 </div>

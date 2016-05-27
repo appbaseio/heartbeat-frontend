@@ -66,7 +66,7 @@ export default class GetParams extends Component {
             <div>
                 {pairs}
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <RaisedButton label="Add New" primary={true} onClick = {this.addNew} />
+                    <RaisedButton label="Add New" primary={true} onClick = {this.addNew} style={{maxWidth:100,maxHeight:50,marginTop:10}} labelStyle={{fontSize:'70%'}} />
                 </MuiThemeProvider>
             </div>
         );

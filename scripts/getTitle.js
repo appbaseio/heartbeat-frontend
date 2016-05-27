@@ -7,7 +7,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 export default class GetTitle extends Component {
 
     state = {
-        data : ""
+        data : "My New Awesome Stream"
     };
 
     handleStateChange = (e) => {
@@ -17,19 +17,22 @@ export default class GetTitle extends Component {
         // console.log(this.state.data);
     }
 
+    // floatingLabelStyle = {{
+    //     fontSize:'90%',
+    //     color:'#00BFFF',
+    //     }}
+
     render(){
+        //floatingLabelText dekhna hai.
         return(
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField
                 onChange = {this.handleStateChange}
-                  floatingLabelText="Name this awesome stream!"
-                  style={{minWidth:450}}
+                  hintText = "Name this stream"
+                  style={{minWidth:250}}
                   value = {this.state.data}
-                  floatingLabelStyle = {{
-                      fontSize:'200%',
-                      color:'#00BFFF'
-                  }}
                   floatingLabelFixed = {true}
+                  floatingLabelText = "Stream Name"
                 />
             </MuiThemeProvider>
         );

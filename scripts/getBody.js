@@ -27,7 +27,7 @@ export default class GetBody extends Component {
                   style={{minWidth:450}}
                   value = {this.state.data}
                   multiLine = {true}
-                  rows = {2}
+                  rows = {10}
                   rowsMax = {100}
                 />
             </MuiThemeProvider>
