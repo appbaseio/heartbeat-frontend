@@ -131,10 +131,10 @@ export default class App extends Component {
                 // isNew : false
             };
             var config = {
-                appname: 'jsfiddle-demo',
-                username: '7eJWHfD4P',
-                password: '431d9cea-5219-4dfb-b798-f897f3a02665',
-                type: "pollRequests"
+                appname: this.refs.sidebar.state.app_name,
+                username: this.refs.sidebar.state.credentials.write.split(':')[0],
+                password: this.refs.sidebar.state.credentials.write.split(':')[1],
+                type: 'RESTAPIs'
             };
             var appbaseRef = new Appbase({
                 url: 'https://scalr.api.appbase.io',
@@ -144,14 +144,17 @@ export default class App extends Component {
             });
             var requestObject = {
                 type: config.type,
-                body: objectToIndex,
-                id: currentTime,
+                body: {
+                    type: currentTime,
+                    title: this.refs.title.state.data
+                },
+                id: currentTime, // this can be removed too, not an issue - toDiscuss
             };
 
-            var streamAndUpdate = this.streamAndUpdate;
+            //var streamAndUpdate = this.streamAndUpdate; // TODO -alag se save button and stream button
             var self = this;
             appbaseRef.index(requestObject).on('data', function(response) {
-                console.log("successfully indexed.");
+                console.log("successfully indexed into RESTAPIs.");
                 var config = {
                     appname: self.refs.sidebar.state.app_name,
                     username: self.refs.sidebar.state.credentials.write.split(':')[0],
@@ -166,12 +169,13 @@ export default class App extends Component {
                 });
                 var requestObject = {
                     type: config.type,
-                    id: 'Element2', // it will have the title
+                    id: currentTime, // it will have the title
                     body: objectToIndex
                 };
                 appbaseRef.index(requestObject).on('data',function(res){
-                    streamAndUpdate(currentTime);
+                    //streamAndUpdate(currentTime); // TODO -see what.
                     console.log(res);
+                    //TODO send to server here.
                 }).on('error', function(err){
                     console.log(err);
                 })
@@ -180,7 +184,8 @@ export default class App extends Component {
             });
             //changing in the side bar
             var temp = this.refs.sidebar.state;
-            temp.types[temp.types.length] = [currentTime, this.refs.title.state.data];
+            console.log(this.refs.title.state.data);
+            temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: this.refs.title.state.data}};
             this.refs.sidebar.setState(temp);
         }else{
             //just start streaming
@@ -212,6 +217,7 @@ export default class App extends Component {
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
+            console.log(type);
             $('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
             var config = {
                 appname: this.refs.sidebar.state.app_name,
@@ -227,14 +233,14 @@ export default class App extends Component {
             });
             var requestObject = {
                 type: config.type,
-                id: 'Element2'
+                id: type
             };
             appbaseRef.get(requestObject).on('data', function(res) {
                 // console.log('here');
                 //res._source wapro
                 var obj = res._source;
                 console.log(res);
-                console.log(config);
+                // console.log(config);
                 self.refs.title.setState({data: obj.title});
                 self.refs.authDetails.setState(obj.authDetails);
                 self.refs.body.setState(obj.body);
