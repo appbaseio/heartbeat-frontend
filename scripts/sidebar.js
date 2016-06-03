@@ -87,7 +87,7 @@ export default class SideBar extends Component {
         $.ajaxSetup({
             crossDomain: true,
             xhrFields: {
-                withCredentials: true
+                // withCredentials: true
             }
         });
 

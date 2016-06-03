@@ -175,7 +175,29 @@ export default class App extends Component {
                 appbaseRef.index(requestObject).on('data',function(res){
                     //streamAndUpdate(currentTime); // TODO -see what.
                     console.log(res);
-                    //TODO send to server here.
+                    //sending to server now
+                    $.ajaxSetup({
+                        type: "POST",
+                        data: {},
+                        dataType: 'json',
+                        xhrFields: {
+                           withCredentials: false
+                        },
+                        crossDomain: true
+                    });
+                    var settings = {
+                      "async": false,
+                      "crossDomain": true,
+                      "url": "http://localhost:3000/api/addEvent/",
+                      "method": "POST",
+                      dataType: "json",
+                      "data": {data:objectToIndex}
+                    }
+                    $.ajax(settings).done(function (response) {
+                      //check from the response if it went okay.
+                      console.log(response);
+                    });
+
                 }).on('error', function(err){
                     console.log(err);
                 })
