@@ -176,6 +176,10 @@ export default class App extends Component {
                     //streamAndUpdate(currentTime); // TODO -see what.
                     console.log(res);
                     //sending to server now
+                    var objectToSend = {
+                        details: objectToIndex,
+                        event_type: "index"
+                    };
                     $.ajaxSetup({
                         type: "POST",
                         data: {},
@@ -191,7 +195,7 @@ export default class App extends Component {
                       "url": "http://localhost:3000/api/addEvent/",
                       "method": "POST",
                       dataType: "json",
-                      "data": {data:objectToIndex}
+                      "data": objectToSend
                     }
                     $.ajax(settings).done(function (response) {
                       //check from the response if it went okay.
