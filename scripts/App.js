@@ -127,7 +127,8 @@ export default class App extends Component {
                 pollingInterval : this.refs.pollingInterval.state.pollingInterval,
                 title : this.refs.title.state.data,
                 credentials : this.refs.sidebar.state.credentials,
-                appName : this.refs.sidebar.state.app_name
+                appName : this.refs.sidebar.state.app_name,
+                isActive: true
                 // isNew : false
             };
             var config = {

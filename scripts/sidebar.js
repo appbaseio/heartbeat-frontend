@@ -148,6 +148,7 @@ export default class SideBar extends Component {
         var requestObject = {
             type: configForTypes.type,
             body: {
+                size: 500, // ahmm??
                 query: {
                     match_all: {}
                 }
