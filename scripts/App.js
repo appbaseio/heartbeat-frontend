@@ -13,6 +13,7 @@ import GetAuthDetails from './getAuthDetails.js';
 import MethodBox from './methodBox.js';
 import PollingInterval from './pollingInterval.js'
 import SideBar from './sidebar.js'
+import Toggle from 'material-ui/Toggle';
 Prism = require('prismjs');
 var makePollerRequestObject = require('./pollerRequestObject.js');
 
@@ -29,7 +30,8 @@ export default class App extends Component {
         loadedFirstTime: true,
         isNew: true,
         currentType : "addnew",
-        currentStream : null
+        currentStream : null,
+        isActive : true
     };
 
     handleUrlChange = (e) => {
@@ -45,6 +47,17 @@ export default class App extends Component {
     };
 
     streamAndUpdate = (type) => {
+        //if not active, no meaning in streaming the thing
+        if(!this.state.isActive){
+            //gif indeicator
+            $("#streamingIndicator").css({"visibility":"hidden"});
+            return;
+        }
+        //gif indeicator
+        $("#streamingIndicator").css({"visibility":"visible"});
+        console.log("this is currentStream");
+        console.log(this.state.currentStream);
+        if(this.state.currentStream!=null){this.state.currentStream.stop();}
         console.log(type);
         var config = {
             appname: this.refs.sidebar.state.app_name,
@@ -60,6 +73,7 @@ export default class App extends Component {
         });
 
         var requestObject = {
+            id: "response",
             type: config.type,
             body: {
                 query: {
@@ -68,18 +82,21 @@ export default class App extends Component {
             }
         };
 
+        console.log(config);
+
         //displaying the export data
         var exportCode = '<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
             url: 'https://scalr.api.appbase.io',\n\
             appname: config.appname,\n\
             username: config.username,\n\
             password: config.password\n\});" + "\n" + "var requestObject = {\n\
+            id: \"response\",\n\
             type: config.type,\n\
             body: {\n\
                 query: {\n\
                     match_all: {}\n\
                 }\n\
-            }\n\};" + "\n" + "appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
+            }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
             console.log('Use the stream object.')\n\
         }).on('error', function(error) {\n\
             console.log('Error handling code');\n\});";
@@ -96,7 +113,7 @@ export default class App extends Component {
         var f = this.setState;
         var self = this;
 
-        var currentStream = appbaseRef.searchStream(requestObject).on('data', function(stream) {
+        var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
             //displaying the updated json data
             var temp = self.state;
             temp.data = JSON.stringify(stream._source, null, 4);
@@ -113,9 +130,13 @@ export default class App extends Component {
 
     };
 
-    submitAndGetType = () => {
+    submitAndStream = () => {
         if (this.state.isNew){
             var currentTime = new Date().getTime().toString();
+            //setting the curretType
+            var temp = this.state;
+            temp.currentType = currentTime;
+            this.setState(temp);
             var objectToIndex = {
                 restApiUrl : this.state.restApiUrl,
                 type : currentTime,
@@ -128,7 +149,7 @@ export default class App extends Component {
                 title : this.refs.title.state.data,
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
-                isActive: true
+                isActive: this.state.isActive
                 // isNew : false
             };
             var config = {
@@ -152,14 +173,16 @@ export default class App extends Component {
                 id: currentTime, // this can be removed too, not an issue - toDiscuss
             };
 
-            //var streamAndUpdate = this.streamAndUpdate; // TODO -alag se save button and stream button
-            var self = this;
+            //keeping the name as self didnt work :/
+            var selff = this;
+            // console.log(self);
             appbaseRef.index(requestObject).on('data', function(response) {
                 console.log("successfully indexed into RESTAPIs.");
+                console.log(selff);
                 var config = {
-                    appname: self.refs.sidebar.state.app_name,
-                    username: self.refs.sidebar.state.credentials.write.split(':')[0],
-                    password: self.refs.sidebar.state.credentials.write.split(':')[1],
+                    appname: selff.refs.sidebar.state.app_name,
+                    username: selff.refs.sidebar.state.credentials.write.split(':')[0],
+                    password: selff.refs.sidebar.state.credentials.write.split(':')[1],
                     type: currentTime
                 };
                 var appbaseRef = new Appbase({
@@ -201,7 +224,10 @@ export default class App extends Component {
                     $.ajax(settings).done(function (response) {
                       //check from the response if it went okay.
                       console.log(response);
-                    });
+                      //streaming only after server responds
+                      console.log(selff);
+                      selff.streamAndUpdate(selff.state.currentType);
+                  });
 
                 }).on('error', function(err){
                     console.log(err);
@@ -214,14 +240,100 @@ export default class App extends Component {
             console.log(this.refs.title.state.data);
             temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: this.refs.title.state.data}};
             this.refs.sidebar.setState(temp);
+            //TODO -- streamAndUpdate
+            // console.log("current type is");
+            // console.log(this.state.currentType);
+            //change in the state
+            var temp = this.state;
+            temp.isNew = false;
+            temp.currentType = currentTime;
+            this.setState(temp);
         }else{
-            //just start streaming
+            var objectToIndex = {
+                type : this.state.currentType,
+                restApiUrl : this.state.restApiUrl,
+                headers : this.refs.headers.state,
+                body : this.refs.body.state,
+                params : this.refs.params.state,
+                authDetails : this.refs.authDetails.state,
+                method : this.refs.method.state.method,
+                pollingInterval : this.refs.pollingInterval.state.pollingInterval,
+                title : this.refs.title.state.data,
+                credentials : this.refs.sidebar.state.credentials,
+                appName : this.refs.sidebar.state.app_name,
+                isActive: this.state.isActive
+            };
+            console.log(objectToIndex);
+            var config = {
+                appname: this.refs.sidebar.state.app_name,
+                username: this.refs.sidebar.state.credentials.write.split(':')[0],
+                password: this.refs.sidebar.state.credentials.write.split(':')[1],
+                type: this.state.currentType
+            };
+            var appbaseRef = new Appbase({
+                url: 'https://scalr.api.appbase.io',
+                appname: config.appname,
+                username: config.username,
+                password: config.password
+            });
+            var requestObject = {
+                type: config.type,
+                id: config.type,
+                body: objectToIndex
+            };
+
+            //var streamAndUpdate = this.streamAndUpdate; // TODO -alag se save button and stream button
+            var self = this;
+            appbaseRef.index(requestObject).on('data', function(response) {
+                console.log("successfully indexed the new details");
+                //streamAndUpdate(currentTime); // TODO -see what.
+                //sending to server now
+                var objectToSend = {
+                    details: objectToIndex,
+                    event_type: "update"
+                };
+                console.log(objectToSend);
+                $.ajaxSetup({
+                    type: "POST",
+                    data: {},
+                    dataType: 'json',
+                    xhrFields: {
+                       withCredentials: false
+                    },
+                    crossDomain: true
+                });
+                var settings = {
+                  "async": false,
+                  "crossDomain": true,
+                  "url": "http://localhost:3000/api/addEvent/",
+                  "method": "POST",
+                  dataType: "json",
+                  "data": objectToSend
+                }
+                $.ajax(settings).done(function (response) {
+                  //TODO-check from the response if it went okay.
+                  console.log(response);
+                });
+            }).on('error', function(error) {
+                console.log("error in indexing the new details.");
+            });
+            //start streaming
+            // this.state.currentStream.stop();
             this.streamAndUpdate(this.state.currentType);
+
+            //emptying the json data part
+            var temp = self.state;
+            temp.data = "";
+            temp.changedNum = 0;
+            temp.highlightedData = "Nothing streamed yet.";
+            self.setState(temp);
 
         }
     };
 
     changeTheContent = (type) => {
+        //gif indeicator off
+        $("#streamingIndicator").css({"visibility":"hidden"});
         var self = this;
         if (type == "addnew") {
             $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
@@ -241,6 +353,7 @@ export default class App extends Component {
             temp.currentType = type;
             temp.highlightedExportCode = "Nothing to export.";
             temp.highlightedData = "Nothing streamed yet.";
+            temp.isActive = true;
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
@@ -284,12 +397,20 @@ export default class App extends Component {
                 temp.currentType = type;
                 temp.highlightedExportCode = "Nothing to export.";
                 temp.highlightedData = "Nothing streamed yet.";
+                temp.isActive = obj.isActive;
                 self.setState(temp);
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
+                self.streamAndUpdate(type);
             }).on('error', function(err) {
                 console.log("getTypes() failed: ", err);
             });
         } // else over here
+    }
+
+    handleToggle = () => {
+        var temp = this.state;
+        temp.isActive = !temp.isActive;
+        this.setState(temp);
     }
 
     render() {
@@ -304,7 +425,20 @@ export default class App extends Component {
                             <GetTitle ref="title" />
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <PollingInterval ref = "pollingInterval" />
-                            <span  className="container-fluid" style={{margin:20, color:'pink', fontSize:'70%'}}><b>NOTE: </b>The Go button is disabled for now. You can can add a new request by clicking {'\'add new\''} and entering the required info. Your request will only be saved on the servers after you click on Stream It button. To stream an already existing request, click on it from the sidebar, once it loads, click on Stream it. <b>DONT MODIFY ALREADY EXISTING REQUESTS, CREATE A NEW ONE IF YOU WANT TO MAKE CHANGES, FOR NOW.</b></span>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginLeft:10, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'80%'}}/>
+                            </MuiThemeProvider>
+                            <span style={{float:"right",maxWidth:200, marginTop:25}}>
+                                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                    <Toggle
+                                        style = {{maxWidth:200}}
+                                        ref="isActive"
+                                        label = "Active/Inactive"
+                                        toggled = {this.state.isActive}
+                                        onToggle = {this.handleToggle}
+                                    />
+                                </MuiThemeProvider>
+                            </span>
                         </div>
                         <div className = "row" style={{marginTop:-20}}>
                             <MethodBox ref="method" />&nbsp;
@@ -316,10 +450,6 @@ export default class App extends Component {
                                   value = {this.state.restApiUrl}
                                   onChange = {this.handleUrlChange}
                                 />
-                            </MuiThemeProvider>
-                            &nbsp;&nbsp;&nbsp;
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                <RaisedButton label="Go!" secondary={true} style={{marginTop:5}} disabled={true}/>
                             </MuiThemeProvider>
                         </div>
                         <div className = "row">
@@ -355,12 +485,10 @@ export default class App extends Component {
                                 <ul className="nav nav-tabs">
                                     <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
                                     <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
+                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
                                 </ul>
                                 <div className="tab-content">
                                     <div id="response" className="tab-pane fade in active">
-                                        {'===>'}<MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <RaisedButton label="Stream it!" primary={true} onClick={this.submitAndGetType} style={{marginLeft:0, marginTop:10, maxWidth:100,maxHeight:50}} labelStyle={{fontSize:'80%'}}/>
-                                        </MuiThemeProvider>{'<==='}
                                         <div className = "well" style={{marginTop:10}}>
                                             Your JSON changed: &nbsp;
                                             <b>{this.state.changedNum}</b> times.<br /><br />
