@@ -4,13 +4,13 @@ export default class SideBar extends Component {
     state = {
         app_name : "",
         credentials : {},
-        types: []
+        titlesAndTypes: []
     };
 
     // create the app
-    r2s_creation = () => {
+    heartbeat_creation = () => {
         var permission = this.permission;
-        var app_name = 'r2s-' + Math.floor(Math.random() * Math.random() * 160000000);
+        var app_name = 'heartbeat-' + Math.floor(Math.random() * Math.random() * 160000000);
         console.log(app_name);
         $.ajax({
             type: "PUT",
@@ -57,7 +57,7 @@ export default class SideBar extends Component {
                     temp.credentials = final_data.permission;
                     self.setState(temp);
                     // console.log(self.state);
-                    self.getAndSetTypes();
+                    self.getAndSetTitlesAndTypes();
 
                     // $('.code_snippet').text(final_snippet);
                     // $('.loading').hide();
@@ -82,16 +82,16 @@ export default class SideBar extends Component {
     }
 
     componentDidMount(){
-        var r2s_creation = this.r2s_creation;
+        var heartbeat_creation = this.heartbeat_creation;
         var permission = this.permission;
         $.ajaxSetup({
             crossDomain: true,
             xhrFields: {
-                withCredentials: true
+                // withCredentials: true
             }
         });
 
-        // check for r2s app, if exists get (read/write) permission,
+        // check for heartbeat app, if exists get (read/write) permission,
         // else create the app first and do permission stuff
         $.ajax({
             async: false,
@@ -106,38 +106,38 @@ export default class SideBar extends Component {
                 if (app_property.length) {
                     for (var i = 0; i < app_property.length; i++) {
                         if (app_creation_flag) {
-                            app_creation_flag = app_property[i].split('-')[0] != 'r2s';
+                            app_creation_flag = app_property[i].split('-')[0] != 'heartbeat';
                             single_app['obj'] = full_data.body.apps[app_property[i]];
                             single_app['app'] = app_property[i];
 
                         }
                     }
                 } else {
-                    r2s_creation();
+                    heartbeat_creation();
                 }
                 if (!app_creation_flag) {
                     console.log("app was found.");
                     permission(single_app['obj'], 'read', single_app['app']);
                     // console.log(full_data.apps);
-                    // store_r2s(full_data.apps);
+                    // store_heartbeat(full_data.apps);
                 } else {
-                    r2s_creation();
+                    heartbeat_creation();
                 }
             },
             error: function() {
                 console.log("error lolo");
                 return;
-                // window.location.href = "index.html"; // do smething here
             }
         });
     };
 
-    getAndSetTypes = () => {
-        //get the types and set them into the State
+    getAndSetTitlesAndTypes = () => {
+        //get the types and title and set them into the State
         var configForTypes = {
             appname: this.state.app_name,
             username: this.state.credentials.write.split(':')[0],
-            password: this.state.credentials.write.split(':')[1]
+            password: this.state.credentials.write.split(':')[1],
+            type: "RESTAPIs"
         };
         var appbaseRef = new Appbase({
             url: 'https://scalr.api.appbase.io',
@@ -145,61 +145,42 @@ export default class SideBar extends Component {
             username: configForTypes.username,
             password: configForTypes.password
         });
+        var requestObject = {
+            type: configForTypes.type,
+            body: {
+                size: 500, // ahmm??
+                query: {
+                    match_all: {}
+                }
+            }
+        };
 
         var self = this;
-        appbaseRef.getTypes().on('data', function(res) {
-            // console.log("All app types: ", res);
+        appbaseRef.search(requestObject).on('data', function(result) {
+            console.log(result.hits.hits);
+            var titlesAndTypes = result.hits.hits;
             var temp = self.state;
-            //temp.types = res;
+            temp.titlesAndTypes = titlesAndTypes;
             self.setState(temp);
-            self.render();
-            // console.log("this is res");
-            // console.log(res);
-            res.map(function(type){
-                if (type != ".percolator" && type != "~logs"){
-                    configForTypes['type'] = type;
-                    var requestObject = {
-                        id : "Element2",
-                        type : type
-                    };
-                    appbaseRef.get(requestObject).on('data', function(res){
-                        // console.log(res);
-                        if(res.found){
-                            var temp = self.state;
-                            temp.types[temp.types.length] = [type, res._source.title]
-                            self.setState(temp);
-                            // console.log(self.state);
-                            // console.log(JSON.stringify(res._source));
-                            console.log([type, res._source.title]);
-                        }
-                    }).on('error', function(err){
-                        console.log(err);
-                    });
-                }
-            });
-            res.map(function(type){
-
-            });
-        }).on('error', function(err) {
-            console.log("getTypes() failed: ", err);
+        }).on('error', function(error){
+            console.log(error+" error getting title and types");
         });
     }
 
     render(){
-        var typesLI = [];
         var self = this;
         //typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
-        typesLI = this.state.types.map(function(tuple){
-            if (tuple[0] != ".percolator" && tuple[0] != "~logs"){
+        var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
+            if (obj._source.type != ".percolator" && obj._source.type != "~logs"){
                 return(
-                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, tuple[0])}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">&nbsp;&nbsp;{tuple[1]}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText" >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
                 );
             }
             //nbsp dala h for the hrs coming ine by line
         });
         // console.log(typesLI);
-        typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
-        typesLI.reverse();
+        titlesAndTypes[titlesAndTypes.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        titlesAndTypes.reverse();
 
         return(
             <div>
@@ -223,7 +204,7 @@ export default class SideBar extends Component {
 
                         <div className="side-menu-container">
                             <ul className="nav navbar-nav">
-                                {typesLI}
+                                {titlesAndTypes}
                             </ul>
                         </div>
                     </nav>
