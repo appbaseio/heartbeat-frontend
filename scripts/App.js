@@ -546,7 +546,7 @@ export default class App extends Component {
                                 <ul className="nav nav-tabs">
                                     <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
                                     <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
-                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
+                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
                                 </ul>
                                 <div className="tab-content">
                                     <div id="response" className="tab-pane fade in active">
