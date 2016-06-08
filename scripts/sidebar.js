@@ -173,7 +173,7 @@ export default class SideBar extends Component {
         var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
             if (obj._source.type != ".percolator" && obj._source.type != "~logs"){
                 return(
-                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText">&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText" >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
                 );
             }
             //nbsp dala h for the hrs coming ine by line

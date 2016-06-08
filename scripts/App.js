@@ -113,20 +113,81 @@ export default class App extends Component {
         var f = this.setState;
         var self = this;
 
-        var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-            //displaying the updated json data
-            var temp = self.state;
-            temp.data = JSON.stringify(stream._source, null, 4);
-            temp.changedNum = temp.changedNum + 1;
-            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-            self.setState(temp);
-        }).on('error', function(error) {
-            console.log("Query error: ", JSON.stringify(error))
-        });
 
-        var temp = this.state;
-        temp.currentStream = currentStream;
-        this.setState(temp);
+        appbaseRef.get(requestObject).on('data', function(res){
+            if(res.found){
+                var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+                    //displaying the updated json data
+                    var temp = self.state;
+                    temp.data = JSON.stringify(stream._source, null, 4);
+                    temp.changedNum = temp.changedNum + 1;
+                    temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                    self.setState(temp);
+                }).on('error', function(error) {
+                    console.log("Query error: ", JSON.stringify(error))
+                });
+
+                var temp = self.state;
+                temp.currentStream = currentStream;
+                self.setState(temp);
+            }else{
+                appbaseRef.index(requestObject).on('data',function(res){
+                    var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+                        //displaying the updated json data
+                        var temp = self.state;
+                        temp.data = JSON.stringify(stream._source, null, 4);
+                        temp.changedNum = temp.changedNum + 1;
+                        temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                        self.setState(temp);
+                    }).on('error', function(error) {
+                        console.log("Query error: ", JSON.stringify(error))
+                    });
+
+                    var temp = self.state;
+                    temp.currentStream = currentStream;
+                    self.setState(temp);
+                }).on('error',function(err){
+                    console.log("error in indexing the dummy"+err);
+                });
+            }
+        }).on('error', function(err){
+            console.log(err);
+        });
+        //indexing a dummy so that getStream doesnt give an error
+        // appbaseRef.index(requestObject).on('data',function(res){
+        //
+        //     var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+        //         //displaying the updated json data
+        //         var temp = self.state;
+        //         temp.data = JSON.stringify(stream._source, null, 4);
+        //         temp.changedNum = temp.changedNum + 1;
+        //         temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+        //         self.setState(temp);
+        //     }).on('error', function(error) {
+        //         console.log("Query error: ", JSON.stringify(error))
+        //     });
+        //
+        //     var temp = self.state;
+        //     temp.currentStream = currentStream;
+        //     self.setState(temp);
+        // }).on('error',function(err){
+        //     console.log("error in indexing the dummy"+err);
+        // });
+
+        // var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+        //     //displaying the updated json data
+        //     var temp = self.state;
+        //     temp.data = JSON.stringify(stream._source, null, 4);
+        //     temp.changedNum = temp.changedNum + 1;
+        //     temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+        //     self.setState(temp);
+        // }).on('error', function(error) {
+        //     console.log("Query error: ", JSON.stringify(error))
+        // });
+        //
+        // var temp = this.state;
+        // temp.currentStream = currentStream;
+        // this.setState(temp);
 
     };
 
@@ -216,7 +277,7 @@ export default class App extends Component {
                     var settings = {
                       "async": false,
                       "crossDomain": true,
-                      "url": "http://localhost:3000/api/addEvent/",
+                      "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
                       "method": "POST",
                       dataType: "json",
                       "data": objectToSend
@@ -305,7 +366,7 @@ export default class App extends Component {
                 var settings = {
                   "async": false,
                   "crossDomain": true,
-                  "url": "http://localhost:3000/api/addEvent/",
+                  "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
                   "method": "POST",
                   dataType: "json",
                   "data": objectToSend
@@ -358,7 +419,7 @@ export default class App extends Component {
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
             console.log(type);
-            $('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
+            //$('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
             var config = {
                 appname: this.refs.sidebar.state.app_name,
                 username: this.refs.sidebar.state.credentials.write.split(':')[0],
