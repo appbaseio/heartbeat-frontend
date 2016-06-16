@@ -67,7 +67,7 @@ export default class GetHeaders extends Component {
             <div>
                 {pairs}
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <RaisedButton label="Add New" primary={true} onClick = {this.addNew} style={{maxWidth:100,maxHeight:50,marginTop:10}} labelStyle={{fontSize:'70%'}} />
+                    <RaisedButton label="Add New" primary={true} onClick = {this.addNew} style={{maxWidth:100,maxHeight:50,marginTop:10}} labelStyle={{fontSize:'80%'}} />
                 </MuiThemeProvider>
             </div>
         );

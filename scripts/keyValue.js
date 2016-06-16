@@ -40,8 +40,8 @@ export default class KeyValue extends Component {
                     <TextField
                       hintText="Enter Key"
                       floatingLabelText="KEY"
-                      style={{maxWidth:'40%'}}
-                      hintStyle={{fontSize:'80%'}}
+                      style={{maxWidth:'35%'}}
+                      hintStyle={{fontSize:'90%'}}
                       inputStyle={{fontSize:'90%'}}
                       value = {this.state.key}
                       onChange = {kc}
@@ -52,8 +52,8 @@ export default class KeyValue extends Component {
                     <TextField
                       hintText="Enter Value"
                       floatingLabelText="VALUE"
-                      style={{maxWidth:'40%'}}
-                      hintStyle={{fontSize:'80%'}}
+                      style={{maxWidth:'35%'}}
+                      hintStyle={{fontSize:'90%'}}
                       inputStyle={{fontSize:'90%'}}
                       value = {this.state.value}
                       onChange = {vc}
@@ -61,7 +61,7 @@ export default class KeyValue extends Component {
                 </MuiThemeProvider>
                 &nbsp;&nbsp;
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
-                    <RaisedButton label="Delete" secondary={true} onClick = {this.handleDelete} style={{maxWidth:100,maxHeight:50}} labelStyle={{fontSize:'70%'}}/>
+                    <RaisedButton label="Delete" secondary={true} onClick = {this.handleDelete} style={{maxWidth:100,maxHeight:50}} labelStyle={{fontSize:'80%'}}/>
                 </MuiThemeProvider>
             </div>
         );

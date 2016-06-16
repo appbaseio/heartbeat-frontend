@@ -474,7 +474,15 @@ export default class App extends Component {
         this.setState(temp);
     }
 
-    render() {
+    render(s){
+        // try{var bodyVisible = (this.refs.method.state.method == "POST" ? true : false)} catch(e){var bodyVisible = false}
+        // if(bodyVisible){
+        //     var bodyElement = <li><a data-toggle="tab" href="#body">Body</a></li>;
+        //     console.log(bodyElement);
+        // }else{
+        //     bodyElement = null;
+        //     console.log('no body');
+        // }
         return (
             <div>
                 <div>
@@ -485,11 +493,7 @@ export default class App extends Component {
                         <div className="row" style={{marginTop:5}}>
                             <GetTitle ref="title" />
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <PollingInterval ref = "pollingInterval" />
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginLeft:10, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'80%'}}/>
-                            </MuiThemeProvider>
-                            <span style={{float:"right",maxWidth:200, marginTop:25}}>
+                            <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
                                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                                     <Toggle
                                         style = {{maxWidth:200}}
@@ -497,20 +501,28 @@ export default class App extends Component {
                                         label = "Active/Inactive"
                                         toggled = {this.state.isActive}
                                         onToggle = {this.handleToggle}
+                                        labelStyle =  {{
+                                            //overflow:"hidden",
+                                            //maxWidth:"50%"
+                                        }}
                                     />
                                 </MuiThemeProvider>
                             </span>
+                            <PollingInterval ref = "pollingInterval" />
                         </div>
-                        <div className = "row" style={{marginTop:-20}}>
-                            <MethodBox ref="method" />&nbsp;
+                        <div className = "row" style={{}}>
+                            <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                 <TextField
                                   hintText="http://www.exampleAPI.com/api/getUserDetails"
                                   floatingLabelText="Type the REST API url here"
-                                  style={{minWidth:'80%', maxWidth:'86%'}}
+                                  style={{width:'72%'}}
                                   value = {this.state.restApiUrl}
                                   onChange = {this.handleUrlChange}
                                 />
+                            </MuiThemeProvider>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                             </MuiThemeProvider>
                         </div>
                         <div className = "row">
@@ -518,9 +530,9 @@ export default class App extends Component {
                                 <div style={{marginTop:25}}>
                                     <ul className="nav nav-tabs">
                                         <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                        <li><a data-toggle="tab" href="#auth">Auth</a></li>
+                                        <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
                                         <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                        <li><a data-toggle="tab" href="#body">Body</a></li>
+                                        <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body</a></li>
                                     </ul>
                                     <div className="tab-content well lightWell" style={{marginTop:25}}>
                                         <div id="params" className="tab-pane fade in active">

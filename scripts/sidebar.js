@@ -93,8 +93,9 @@ export default class SideBar extends Component {
 
         // check for heartbeat app, if exists get (read/write) permission,
         // else create the app first and do permission stuff
+        console.log("making the sidebar request");
         $.ajax({
-            async: false,
+            async: true,
             type: "GET",
             url: 'https://accapi.appbase.io/user',
             dataType: 'json',
@@ -124,8 +125,8 @@ export default class SideBar extends Component {
                     heartbeat_creation();
                 }
             },
-            error: function() {
-                console.log("error lolo");
+            error: function(err) {
+                console.log(err);
                 return;
             }
         });
@@ -173,13 +174,13 @@ export default class SideBar extends Component {
         var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
             if (obj._source.type != ".percolator" && obj._source.type != "~logs"){
                 return(
-                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText" >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
+                    <li className="sidebarLI smallText" key={obj._source.type} onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText" >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
                 );
             }
             //nbsp dala h for the hrs coming ine by line
         });
         // console.log(typesLI);
-        titlesAndTypes[titlesAndTypes.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        titlesAndTypes[titlesAndTypes.length] = <li className="sidebarLI smallText" key="addNew" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
         titlesAndTypes.reverse();
 
         return(

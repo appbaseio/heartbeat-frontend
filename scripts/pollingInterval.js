@@ -1,34 +1,44 @@
 import React, {Component} from 'react';
-import TextField from 'material-ui/TextField';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Slider from 'material-ui/Slider';
 
 
 export default class PollingInterval extends Component {
 
     state = {
-        pollingInterval : "5"
+        pollingInterval : 5
     };
 
-    handleStateChange = (e) => {
+    handleStateChange = (e,v) => {
         var temp = this.state;
-        temp.pollingInterval = e.target.value;
+        // console.log(500*(v-0.1));
+        v = (v == 0 ? 1 : v*5);
+        temp.pollingInterval = v;
         this.setState(temp);
-        // console.log(this.state.pollingInterval);
     }
 
     render(){
         return(
-            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                <TextField
-                    onChange = {this.handleStateChange}
-                    floatingLabelText="Poll interval"
-                    hintText = "In seconds"
-                    style={{minWidth:40, maxWidth:100}}
-                    value = {this.state.pollingInterval}
-                    multiLine = {false}
-                />
-            </MuiThemeProvider>
+            <span style = {{
+                width: '10%',
+                float: 'right',
+                marginRight: 15,
+                marginBottom: -40,
+                marginTop: 0
+            }} >
+                <small style={{fontWeight:"bold"}}>Polling Interval: <br /> {this.state.pollingInterval} min(s)</small>
+                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                    <Slider
+                        min = {0}
+                        max = {12}
+                        step = {1}
+                        defaultValue = {1}
+                        onChange = {this.handleStateChange.bind(this)}
+
+                    />
+                </MuiThemeProvider>
+            </span>
         );
     };
 

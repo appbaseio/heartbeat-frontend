@@ -26,8 +26,13 @@
   margin-left: 0;
 }
 .smallText{
-    font-weight: bold;
-    font-size: 70%;
+    font-weight: lighter;
+    display:inline-block;
+    overflow: hidden;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 97%;
 }
 /*
     Sometimes the sub menus get too large for the page and prevent the menu from scrolling, limiting functionality

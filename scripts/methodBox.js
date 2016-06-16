@@ -13,14 +13,22 @@ export default class MethodBox extends React.Component {
     };
 
     handleChange = (e) => {
-        this.setState({"method" : e.target.value});
+        var temp = this.state;
+        temp.method = e.target.value;
+        this.setState(temp);
+        if(e.target.value == "GET"){
+            $("#bodyTab").css("display","none");
+            // $("#body").css("display","none");
+        }else{
+            $("#bodyTab").css("display","inline");
+        }
     }
 
     render(){
         return(
-            <span className = "navbar-form" style={{marginLeft:-15}}>
+            <span className = "navbar-form" style={{}}>
                 <span className="form-group">
-                    <select className="form-control input-md" id="sel1" style = {{maxWidth:100, cursor:"poiner"}} onChange={this.handleChange}>
+                    <select className="form-control input-md" id="sel1" style = {{maxWidth:100, cursor:"pointer"}} onChange={this.handleChange} value={this.state.method}>
                     <option>GET</option>
                     <option>POST</option>
                   </select>
