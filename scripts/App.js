@@ -193,6 +193,10 @@ export default class App extends Component {
 
     submitAndStream = () => {
         if (this.state.isNew){
+            if(this.refs.sidebar.state.titlesAndTypes.length >=5){
+                alert('Go Premium!');
+                return;
+            }
             var currentTime = new Date().getTime().toString();
             //setting the curretType
             var temp = this.state;
