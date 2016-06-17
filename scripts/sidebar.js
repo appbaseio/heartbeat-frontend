@@ -158,7 +158,7 @@ export default class SideBar extends Component {
 
         var self = this;
         appbaseRef.search(requestObject).on('data', function(result) {
-            console.log(result.hits.hits);
+            // console.log(result.hits.hits);
             var titlesAndTypes = result.hits.hits;
             var temp = self.state;
             temp.titlesAndTypes = titlesAndTypes;

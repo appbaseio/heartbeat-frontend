@@ -7,8 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 export default class KeyValue extends Component {
     state = {
         timeStamp : this.props.timeStamp,
-        key  : "",
-        value : ""
+        key  : this.props.keyy,
+        value : this.props.value
     };
 
     handleKeyChange = (e) => {

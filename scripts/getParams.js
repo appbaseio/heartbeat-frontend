@@ -54,11 +54,14 @@ export default class GetParams extends Component {
     }
 
     render(){
+        // console.log(this.state.keyValuePairs);
         var hd = this.handleDelete;
         var hs = this.handleStateChange;
         var pairs = this.state.keyValuePairs.map(function(pair){
+            // console.log(pair);
+            // console.log(pair);
             return(
-                <KeyValue timeStamp = {pair.timeStamp} handleDelete = {hd} handleStateChange = {hs} />
+                <KeyValue timeStamp = {pair.timeStamp} handleDelete = {hd} handleStateChange = {hs} keyy = { pair.key} value = {pair.value} key={pair.timeStamp} />
             );
         });
 

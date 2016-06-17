@@ -440,7 +440,7 @@ export default class App extends Component {
                 // console.log('here');
                 //res._source wapro
                 var obj = res._source;
-                console.log(res);
+                // console.log(obj);
                 // console.log(config);
                 self.refs.title.setState({data: obj.title});
                 self.refs.authDetails.setState(obj.authDetails);

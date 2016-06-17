@@ -89,7 +89,13 @@
 }
 .side-menu .navbar-nav li a {
   padding: 15px;
-  width: 200px;
+  max-width: 199px;
+  font-weight: lighter;
+  display:inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 97%;
 }
 .side-menu .navbar-nav li a .glyphicon {
   padding-right: 5px;
