@@ -24,7 +24,7 @@ export default class GetBody extends Component {
                 <TextField
                 onChange = {this.handleStateChange}
                   floatingLabelText="BODY"
-                  style={{minWidth:450}}
+                  style={{minWidth:450,minHeight:250}}
                   value = {this.state.data}
                   multiLine = {true}
                   rows = {10}

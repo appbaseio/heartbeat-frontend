@@ -16,15 +16,15 @@ export default class MethodBox extends React.Component {
         var temp = this.state;
         temp.method = e.target.value;
         this.setState(temp);
-        if(e.target.value == "GET"){
-            $("#bodyTab").css("display","none");
-            // $("#body").css("display","none");
-        }else{
-            $("#bodyTab").css("display","inline");
-        }
     }
 
     render(){
+        //any better way or place?
+        if(this.state.method == "GET"){
+            $("#bodyTab").css("display","none");
+        }else{
+            $("#bodyTab").css("display","inline");
+        }
         return(
             <span className = "navbar-form" style={{}}>
                 <span className="form-group">
