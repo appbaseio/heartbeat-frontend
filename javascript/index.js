@@ -9,7 +9,7 @@ $('.login-button').click(function() {
 // goto dashboard
 $('#dashboard-link').click(function() {
     if (isLoggedIn) {
-        window.location.href = 'http://methi.io/REST-API-to-Streaming-API-frontend/nextPage.html';
+        window.location.href = 'http://162.243.103.4:8000/nextPage.html';
     } else {
         $('.modal').modal('show');
     }
@@ -33,7 +33,7 @@ $.ajax({
     success: function(full_data) {
         console.log(full_data);
         isLoggedIn = true;
-        window.location.href = 'http://methi.io/REST-API-to-Streaming-API-frontend/nextPage.html'
+        window.location.href = 'http://162.243.103.4:8000/nextPage.html'
     },
     error: function(e) {
         console.log("not logged in.");

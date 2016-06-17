@@ -20,6 +20,6 @@ $.ajax({
     error: function(e) {
         console.log(e);
         console.log('unsucesseful');
-        window.location.href = 'http://methi.io/REST-API-to-Streaming-API-frontend/index.html';
+        window.location.href = 'http://162.243.103.4:8000/index.html';
     }
 });
