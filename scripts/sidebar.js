@@ -169,6 +169,14 @@ export default class SideBar extends Component {
     }
 
     render(){
+        var addNewLi;
+        if (this.state.titlesAndTypes.length == 5){
+            addNewLi = <li className="sidebarLI smallText" key="addNew" style={{background:"#EED1DE"}}><a href="#"><span className="smallText" style={{color:"#FF0072", fontSize:"80%"}}>Go Premium to have more!</span></a></li>;
+        }else if (this.state.titlesAndTypes.length < 5){
+            addNewLi = <li className="sidebarLI smallText" key="addNew" onClick={this.props.changeTheContent.bind(this, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        }else{
+            addNewLi = null;
+        }
         var self = this;
         //typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
         var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
@@ -180,7 +188,7 @@ export default class SideBar extends Component {
             //nbsp dala h for the hrs coming ine by line
         });
         // console.log(typesLI);
-        titlesAndTypes[titlesAndTypes.length] = <li className="sidebarLI smallText" key="addNew" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        titlesAndTypes[titlesAndTypes.length] = addNewLi;
         titlesAndTypes.reverse();
 
         return(
