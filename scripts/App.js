@@ -396,6 +396,12 @@ export default class App extends Component {
         }
     };
 
+    changeTheContentAfterDeletion = (type) => {
+        if(type == this.state.currentType){
+            this.changeTheContent('addnew');
+        }
+    }
+
     changeTheContent = (type) => {
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
@@ -490,7 +496,7 @@ export default class App extends Component {
         return (
             <div>
                 <div>
-                    <SideBar changeTheContent={this.changeTheContent} ref="sidebar" />
+                    <SideBar changeTheContent={this.changeTheContent} changeTheContentAfterDeletion={this.changeTheContentAfterDeletion} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
                     <div className="side-body">

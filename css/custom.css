@@ -1,3 +1,7 @@
+span.deleteIcon:hover {
+    color:'#FF0000' !important;
+}
+
 #toastMessageAddNew, #streamItToast{
     width:200px;
     height:20px;
@@ -89,7 +93,7 @@
 }
 .side-menu .navbar-nav li a {
   padding: 15px;
-  max-width: 199px;
+  max-width: 170px;
   font-weight: lighter;
   display:inline-block;
   overflow: hidden;
