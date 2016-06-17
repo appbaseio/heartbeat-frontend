@@ -532,23 +532,19 @@ export default class App extends Component {
                                         <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
                                         <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
                                         <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                        <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body</a></li>
+                                        <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
                                     </ul>
                                     <div className="tab-content well lightWell" style={{marginTop:25}}>
                                         <div id="params" className="tab-pane fade in active">
-                                            <h4>URL Parameters</h4>
                                             <GetParams ref="params" />
                                         </div>
                                         <div id="auth" className="tab-pane fade">
-                                            <h4>Auth Details</h4>
                                             <GetAuthDetails ref = "authDetails" />
                                         </div>
                                         <div id="headers" className="tab-pane fade">
-                                            <h4>Headers</h4>
                                             <GetHeaders ref="headers" />
                                         </div>
                                         <div id="body" className="tab-pane fade">
-                                            <h4>Body</h4>
                                             <GetBody ref="body" />
                                         </div>
                                     </div>
@@ -557,7 +553,9 @@ export default class App extends Component {
                             <div className = "col-sm-6" style={{marginTop:25}}>
                                 <ul className="nav nav-tabs">
                                     <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
-                                    <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
+                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <RaisedButton data-toggle="modal" data-target="#exportCode" label="Export this stream!" primary={true} style={{maxHeight:50, marginLeft:5}} labelStyle={{fontSize:'90%'}}/>
+                                    </MuiThemeProvider>
                                     <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
                                 </ul>
                                 <div className="tab-content">
@@ -572,13 +570,26 @@ export default class App extends Component {
                                             </pre>
                                         </div>
                                     </div>
-                                    <div id="exportCode" className="tab-pane fade">
-                                        <div style={{marginTop:25}}>
-                                            <pre>
-                                                <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
-                                                </code>
-                                            </pre>
-                                        </div>
+                                    <div id="exportCode" className="modal fade" role = "dialog">
+                                        <div className="modal-dialog">
+                                           <div className="modal-content">
+                                             <div className="modal-header">
+                                               <button type="button" className="close" data-dismiss="modal">&times;</button>
+                                               <h4 className="modal-title">Export Code</h4>
+                                             </div>
+                                             <div className="modal-body">
+                                                 <div>
+                                                     <pre>
+                                                         <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
+                                                         </code>
+                                                     </pre>
+                                                 </div>
+                                             </div>
+                                             <div className="modal-footer">
+                                               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                                             </div>
+                                           </div>
+                                         </div>
                                     </div>
                                 </div>
                             </div>

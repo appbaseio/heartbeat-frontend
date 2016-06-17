@@ -197,7 +197,7 @@ export default class SideBar extends Component {
                                 </button>
                                 <div className="brand-name-wrapper">
                                     <a className="navbar-brand" href="#">
-                                        <b>Rest2Streaming</b>
+                                        <b>Heartbeat</b>
                                     </a>
                                 </div>
                             </div>
