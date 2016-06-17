@@ -193,6 +193,10 @@ export default class App extends Component {
 
     submitAndStream = () => {
         if (this.state.isNew){
+            if(this.refs.sidebar.state.titlesAndTypes.length >=5){
+                alert('Go Premium!');
+                return;
+            }
             var currentTime = new Date().getTime().toString();
             //setting the curretType
             var temp = this.state;
@@ -392,6 +396,12 @@ export default class App extends Component {
         }
     };
 
+    changeTheContentAfterDeletion = (type) => {
+        if(type == this.state.currentType){
+            this.changeTheContent('addnew');
+        }
+    }
+
     changeTheContent = (type) => {
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
@@ -440,7 +450,7 @@ export default class App extends Component {
                 // console.log('here');
                 //res._source wapro
                 var obj = res._source;
-                console.log(res);
+                // console.log(obj);
                 // console.log(config);
                 self.refs.title.setState({data: obj.title});
                 self.refs.authDetails.setState(obj.authDetails);
@@ -474,22 +484,26 @@ export default class App extends Component {
         this.setState(temp);
     }
 
-    render() {
+    render(s){
+        // try{var bodyVisible = (this.refs.method.state.method == "POST" ? true : false)} catch(e){var bodyVisible = false}
+        // if(bodyVisible){
+        //     var bodyElement = <li><a data-toggle="tab" href="#body">Body</a></li>;
+        //     console.log(bodyElement);
+        // }else{
+        //     bodyElement = null;
+        //     console.log('no body');
+        // }
         return (
             <div>
                 <div>
-                    <SideBar changeTheContent={this.changeTheContent} ref="sidebar" />
+                    <SideBar changeTheContent={this.changeTheContent} changeTheContentAfterDeletion={this.changeTheContentAfterDeletion} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
                     <div className="side-body">
                         <div className="row" style={{marginTop:5}}>
                             <GetTitle ref="title" />
                             &nbsp;&nbsp;&nbsp;&nbsp;
-                            <PollingInterval ref = "pollingInterval" />
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginLeft:10, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'80%'}}/>
-                            </MuiThemeProvider>
-                            <span style={{float:"right",maxWidth:200, marginTop:25}}>
+                            <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
                                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                                     <Toggle
                                         style = {{maxWidth:200}}
@@ -497,20 +511,28 @@ export default class App extends Component {
                                         label = "Active/Inactive"
                                         toggled = {this.state.isActive}
                                         onToggle = {this.handleToggle}
+                                        labelStyle =  {{
+                                            //overflow:"hidden",
+                                            //maxWidth:"50%"
+                                        }}
                                     />
                                 </MuiThemeProvider>
                             </span>
+                            <PollingInterval ref = "pollingInterval" />
                         </div>
-                        <div className = "row" style={{marginTop:-20}}>
-                            <MethodBox ref="method" />&nbsp;
+                        <div className = "row" style={{}}>
+                            <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                 <TextField
                                   hintText="http://www.exampleAPI.com/api/getUserDetails"
                                   floatingLabelText="Type the REST API url here"
-                                  style={{minWidth:'80%', maxWidth:'86%'}}
+                                  style={{width:'72%'}}
                                   value = {this.state.restApiUrl}
                                   onChange = {this.handleUrlChange}
                                 />
+                            </MuiThemeProvider>
+                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                             </MuiThemeProvider>
                         </div>
                         <div className = "row">
@@ -518,25 +540,21 @@ export default class App extends Component {
                                 <div style={{marginTop:25}}>
                                     <ul className="nav nav-tabs">
                                         <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                        <li><a data-toggle="tab" href="#auth">Auth</a></li>
+                                        <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
                                         <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                        <li><a data-toggle="tab" href="#body">Body</a></li>
+                                        <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
                                     </ul>
                                     <div className="tab-content well lightWell" style={{marginTop:25}}>
                                         <div id="params" className="tab-pane fade in active">
-                                            <h4>URL Parameters</h4>
                                             <GetParams ref="params" />
                                         </div>
                                         <div id="auth" className="tab-pane fade">
-                                            <h4>Auth Details</h4>
                                             <GetAuthDetails ref = "authDetails" />
                                         </div>
                                         <div id="headers" className="tab-pane fade">
-                                            <h4>Headers</h4>
                                             <GetHeaders ref="headers" />
                                         </div>
                                         <div id="body" className="tab-pane fade">
-                                            <h4>Body</h4>
                                             <GetBody ref="body" />
                                         </div>
                                     </div>
@@ -545,8 +563,10 @@ export default class App extends Component {
                             <div className = "col-sm-6" style={{marginTop:25}}>
                                 <ul className="nav nav-tabs">
                                     <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
-                                    <li className=""><a data-toggle="tab" href="#exportCode">Export it</a></li>
-                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
+                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <RaisedButton data-toggle="modal" data-target="#exportCode" label="Export this stream!" primary={true} style={{maxHeight:50, marginLeft:5}} labelStyle={{fontSize:'90%'}}/>
+                                    </MuiThemeProvider>
+                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
                                 </ul>
                                 <div className="tab-content">
                                     <div id="response" className="tab-pane fade in active">
@@ -560,13 +580,26 @@ export default class App extends Component {
                                             </pre>
                                         </div>
                                     </div>
-                                    <div id="exportCode" className="tab-pane fade">
-                                        <div style={{marginTop:25}}>
-                                            <pre>
-                                                <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
-                                                </code>
-                                            </pre>
-                                        </div>
+                                    <div id="exportCode" className="modal fade" role = "dialog">
+                                        <div className="modal-dialog">
+                                           <div className="modal-content">
+                                             <div className="modal-header">
+                                               <button type="button" className="close" data-dismiss="modal">&times;</button>
+                                               <h4 className="modal-title">Export Code</h4>
+                                             </div>
+                                             <div className="modal-body">
+                                                 <div>
+                                                     <pre>
+                                                         <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
+                                                         </code>
+                                                     </pre>
+                                                 </div>
+                                             </div>
+                                             <div className="modal-footer">
+                                               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                                             </div>
+                                           </div>
+                                         </div>
                                     </div>
                                 </div>
                             </div>

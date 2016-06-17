@@ -93,8 +93,9 @@ export default class SideBar extends Component {
 
         // check for heartbeat app, if exists get (read/write) permission,
         // else create the app first and do permission stuff
+        console.log("making the sidebar request");
         $.ajax({
-            async: false,
+            async: true,
             type: "GET",
             url: 'https://accapi.appbase.io/user',
             dataType: 'json',
@@ -124,8 +125,8 @@ export default class SideBar extends Component {
                     heartbeat_creation();
                 }
             },
-            error: function() {
-                console.log("error lolo");
+            error: function(err) {
+                console.log(err);
                 return;
             }
         });
@@ -157,7 +158,7 @@ export default class SideBar extends Component {
 
         var self = this;
         appbaseRef.search(requestObject).on('data', function(result) {
-            console.log(result.hits.hits);
+            // console.log(result.hits.hits);
             var titlesAndTypes = result.hits.hits;
             var temp = self.state;
             temp.titlesAndTypes = titlesAndTypes;
@@ -167,19 +168,99 @@ export default class SideBar extends Component {
         });
     }
 
+    deleteRequest = (id, e) => {
+        //deleting from the server
+        var objectToSend = {
+            details: {
+                type: id,
+                isActive: false
+            },
+            event_type: "delete"
+        };
+        $.ajaxSetup({
+            type: "POST",
+            data: {},
+            dataType: 'json',
+            xhrFields: {
+               withCredentials: false
+            },
+            crossDomain: true
+        });
+        var settings = {
+          "async": false,
+          "crossDomain": true,
+          "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
+          "method": "POST",
+          dataType: "json",
+          "data": objectToSend
+        }
+        var self = this;
+        $.ajax(settings).done(function (response) {
+          //check from the response if it went okay.
+          console.log(response);
+          //streaming only after server responds
+          //deleting it from appbase
+          var configForTypes = {
+              appname: self.state.app_name,
+              username: self.state.credentials.write.split(':')[0],
+              password: self.state.credentials.write.split(':')[1],
+              type: "RESTAPIs"
+          };
+          var appbaseRef = new Appbase({
+              url: 'https://scalr.api.appbase.io',
+              appname: configForTypes.appname,
+              username: configForTypes.username,
+              password: configForTypes.password
+          });
+          var requestObject = {
+              type: configForTypes.type,
+              id: id,
+          };
+          appbaseRef.delete(requestObject).on('data',function(response){
+              //can check in the shards, but um.
+
+              //deleting from current state
+              var temp = self.state;
+              for (var i = 0; i<temp.titlesAndTypes.length; i++){
+                  if (temp.titlesAndTypes[i]._source.type == id){
+                      temp.titlesAndTypes.splice(i,1);
+                      break;
+                  }
+              }
+              self.setState(temp);
+              //clearing all the fields
+              self.props.changeTheContentAfterDeletion(id);
+          }).on('error', function(err){
+              console.log(err);
+          });
+      });
+    }
+
     render(){
+        var addNewLi;
+        if (this.state.titlesAndTypes.length == 5){
+            addNewLi = <li className="sidebarLI smallText" key="addNew" style={{background:"#EED1DE"}}><a href="#"><span className="smallText" style={{color:"#FF0072", fontSize:"85%"}}>Go Premium to have more!</span></a></li>;
+        }else if (this.state.titlesAndTypes.length < 5){
+            addNewLi = <li className="sidebarLI smallText" key="addNew" onClick={this.props.changeTheContent.bind(this, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        }else{
+            addNewLi = null;
+        }
         var self = this;
         //typesLI[typesLI.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
         var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
-            if (obj._source.type != ".percolator" && obj._source.type != "~logs"){
-                return(
-                    <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, obj._source.type)}><a href="#"><span className="glyphicon glyphicon-cloud"></span><span className="smallText" >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>
-                );
-            }
+            return(
+                <li className="sidebarLI smallText" key={obj._source.type} >
+                    <span className="btn btn-inverse btn-disabled deleteIcon" style={{float:"right", padding:5, marginTop:8, cursor:'pointer',color:'#00BFFF'}}><i className="glyphicon glyphicon-trash"  onClick={self.deleteRequest.bind(this, obj._source.type)}></i></span>
+                    <a href="#">
+                        <span className="glyphicon glyphicon-cloud"></span>
+                        <span className="smallText" onClick={self.props.changeTheContent.bind(self, obj._source.type)} >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    </a>
+                </li>
+            );
             //nbsp dala h for the hrs coming ine by line
         });
         // console.log(typesLI);
-        titlesAndTypes[titlesAndTypes.length] = <li className="sidebarLI" onClick={self.props.changeTheContent.bind(self, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+        titlesAndTypes[titlesAndTypes.length] = addNewLi;
         titlesAndTypes.reverse();
 
         return(
@@ -196,7 +277,7 @@ export default class SideBar extends Component {
                                 </button>
                                 <div className="brand-name-wrapper">
                                     <a className="navbar-brand" href="#">
-                                        <b>Rest2Streaming</b>
+                                        <b>Heartbeat</b>
                                     </a>
                                 </div>
                             </div>
