@@ -564,7 +564,7 @@ export default class App extends Component {
                                 <ul className="nav nav-tabs">
                                     <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
                                     <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <RaisedButton data-toggle="modal" data-target="#exportCode" label="Export this stream!" primary={true} style={{maxHeight:50, marginLeft:5}} labelStyle={{fontSize:'90%'}}/>
+                                            <RaisedButton onClick={SelectText.bind(this,'codeToBeSelected')} data-toggle="modal" data-target="#exportCode" label="Export this stream!" primary={true} style={{maxHeight:50, marginLeft:5}} labelStyle={{fontSize:'90%'}}/>
                                     </MuiThemeProvider>
                                     <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
                                 </ul>
@@ -590,7 +590,7 @@ export default class App extends Component {
                                              <div className="modal-body">
                                                  <div>
                                                      <pre>
-                                                         <code style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}}>
+                                                         <code contenteditable style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}} id="codeToBeSelected">
                                                          </code>
                                                      </pre>
                                                  </div>
