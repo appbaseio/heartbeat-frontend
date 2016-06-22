@@ -2,8 +2,12 @@ var isLoggedIn = false;
 
 // open popup modal
 // Link of google login and github login is in modal html
-$('.login-button').click(function() {
-    $('.modal').modal('show');
+$('#loginButton').click(function() {
+    if(!isLoggedIn){
+        $('.modal').modal('show');
+    }else{
+        window.location.href = 'nextPage.html';
+    }
 });
 
 // goto dashboard
@@ -24,6 +28,7 @@ $.ajaxSetup({
     }
 });
 
+
 // check if user is already logged or not
 $.ajax({
     type: "GET",
@@ -33,10 +38,11 @@ $.ajax({
     success: function(full_data) {
         console.log(full_data);
         isLoggedIn = true;
-        window.location.href = 'nextPage.html'
+        // window.location.href = 'nextPage.html'
+        document.getElementById('loginButton').innerHTML = 'Go to dashboard'
     },
     error: function(e) {
         console.log("not logged in.");
-        $('.modal').modal('show');
+        // $('.modal').modal('show');
     }
 });
