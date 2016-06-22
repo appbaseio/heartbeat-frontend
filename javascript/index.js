@@ -13,7 +13,7 @@ $('#loginButton').click(function() {
 // goto dashboard
 $('#dashboard-link').click(function() {
     if (isLoggedIn) {
-        window.location.href = 'http://162.243.103.4:8000/nextPage.html';
+        window.location.href = 'nextPage.html';
     } else {
         $('.modal').modal('show');
     }
