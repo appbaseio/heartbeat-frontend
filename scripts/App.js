@@ -508,7 +508,7 @@ export default class App extends Component {
                                     <Toggle
                                         style = {{maxWidth:200}}
                                         ref="isActive"
-                                        label = "Active/Inactive"
+                                        label = "Active"
                                         toggled = {this.state.isActive}
                                         onToggle = {this.handleToggle}
                                         labelStyle =  {{
