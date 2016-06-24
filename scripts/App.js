@@ -281,7 +281,7 @@ export default class App extends Component {
                     var settings = {
                       "async": false,
                       "crossDomain": true,
-                      "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
+                      "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
                       "method": "POST",
                       dataType: "json",
                       "data": objectToSend
@@ -370,7 +370,7 @@ export default class App extends Component {
                 var settings = {
                   "async": false,
                   "crossDomain": true,
-                  "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
+                  "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
                   "method": "POST",
                   dataType: "json",
                   "data": objectToSend
