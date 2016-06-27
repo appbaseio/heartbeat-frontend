@@ -124,6 +124,7 @@ export default class SideBar extends Component {
                 } else {
                     heartbeat_creation();
                 }
+                $(".loader").fadeOut("slow");
             },
             error: function(err) {
                 console.log(err);

@@ -9,7 +9,7 @@ $.ajaxSetup({
 // check if user is already logged or not
 $.ajax({
     type: 'GET',
-    async: true,
+    async: false,
     url: 'https://accapi.appbase.io/user',
     dataType: 'json',
     contentType: "application/json",
