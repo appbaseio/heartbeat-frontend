@@ -233,8 +233,10 @@ export default class SideBar extends Component {
               //clearing all the fields
               self.props.changeTheContentAfterDeletion(id);
               $(".loader").fadeOut("slow");
+              toastr.success("Successfully deleted!");
           }).on('error', function(err){
               $(".loader").fadeOut("slow");
+              toastr.error("Error in deleting, refresh the page and try again!");
               console.log(err);
           });
       });

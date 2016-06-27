@@ -40,7 +40,7 @@ span.deleteIcon:hover {
   margin-left: 0;
 }
 .smallText{
-    font-weight: lighter;
+    /*font-weight: lighter;*/
     display:inline-block;
     overflow: hidden;
     width: 100%;

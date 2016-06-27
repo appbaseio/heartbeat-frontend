@@ -198,7 +198,7 @@ export default class App extends Component {
         if (this.state.isNew){
             if(this.refs.sidebar.state.titlesAndTypes.length >=5){
                 alert('Go Premium!');
-                $(".loader").fadeIn("fast");
+                $(".loader").fadeOut("fast");
                 return;
             }
             var currentTime = new Date().getTime().toString();
@@ -296,6 +296,7 @@ export default class App extends Component {
                       //streaming only after server responds
                       console.log(selff);
                       $(".loader").fadeOut("slow");
+                      toastr.success("Succesfully added!");
                       //changing in the side bar
                       var temp = selff.refs.sidebar.state;
                       console.log(selff.refs.title.state.data);
@@ -309,10 +310,12 @@ export default class App extends Component {
                   });
                 }).on('error', function(err){
                     $(".loader").fadeOut("slow");
+                    toastr.error("Some error occured, try again in a moment?");
                     console.log(err);
                 })
             }).on('error', function(error) {
                 $(".loader").fadeOut("slow");
+                toastr.error("Some error occured, try again in a moment?");
                 console.log("error in indexing.");
             });
         }else{
@@ -381,10 +384,12 @@ export default class App extends Component {
                   //TODO-check from the response if it went okay.
                   console.log(response);
                   $(".loader").fadeOut("slow");
+                  toastr.success("Successfuly saved!");
                 });
             }).on('error', function(error) {
                 console.log("error in indexing the new details.");
                 $(".loader").fadeOut("slow");
+                toastr.error("Some error occured, try again in a moment?");
             });
             //start streaming
             // this.state.currentStream.stop();
@@ -427,6 +432,7 @@ export default class App extends Component {
             temp.isNew = true;
             temp.currentType = type;
             temp.highlightedExportCodeJS = "Nothing to export.";
+            temp.highlightedExportCodeCurl = "Nothing to export.";
             temp.highlightedData = "Nothing streamed yet.";
             temp.isActive = true;
             self.setState(temp);
@@ -478,8 +484,10 @@ export default class App extends Component {
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
                 self.streamAndUpdate(type);
                 $(".loader").fadeOut("fast");
+                toastr.success("Successfully loaded!");
             }).on('error', function(err) {
                 $(".loader").fadeOut("fast");
+                toastr.error("Some error occured, try back in a moment?");
                 console.log("getting details failed ", err);
             });
         } // else over here
@@ -598,14 +606,16 @@ export default class App extends Component {
                                     <div className="tab-content" style={{marginTop:5,width:"90%"}}>
                                         <div id = "exportInCurl" className="tab-pane fade in active">
                                             <pre>
-                                                <code contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
+                                                <button className="copybtn btn btn-md btn-info" data-clipboard-target="#curlcode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
+                                                <code id="curlcode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
                                                 </code>
                                             </pre>
                                         </div>
                                         <div id = "exportInJS" className="tab-pane fade">
                                             <div id="exportCode" className="">
                                                 <pre>
-                                                    <code contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeJS}}>
+                                                    <button className="copybtn btn btn-md btn-info" data-clipboard-target="#jscode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
+                                                    <code id="jscode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeJS}}>
                                                     </code>
                                                 </pre>
                                             </div>
