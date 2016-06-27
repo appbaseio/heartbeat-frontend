@@ -170,6 +170,7 @@ export default class SideBar extends Component {
     }
 
     deleteRequest = (id, e) => {
+        $(".loader").fadeIn("fast");
         //deleting from the server
         var objectToSend = {
             details: {
@@ -190,7 +191,7 @@ export default class SideBar extends Component {
         var settings = {
           "async": false,
           "crossDomain": true,
-          "url": "http://" + require('./config.js').serverURL + "/api/addEvent/",
+          "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
           "method": "POST",
           dataType: "json",
           "data": objectToSend
@@ -231,7 +232,9 @@ export default class SideBar extends Component {
               self.setState(temp);
               //clearing all the fields
               self.props.changeTheContentAfterDeletion(id);
+              $(".loader").fadeOut("slow");
           }).on('error', function(err){
+              $(".loader").fadeOut("slow");
               console.log(err);
           });
       });

@@ -194,9 +194,11 @@ export default class App extends Component {
     };
 
     submitAndStream = () => {
+        $(".loader").fadeIn("slow");
         if (this.state.isNew){
             if(this.refs.sidebar.state.titlesAndTypes.length >=5){
                 alert('Go Premium!');
+                $(".loader").fadeIn("fast");
                 return;
             }
             var currentTime = new Date().getTime().toString();
@@ -293,28 +295,26 @@ export default class App extends Component {
                       console.log(response);
                       //streaming only after server responds
                       console.log(selff);
+                      $(".loader").fadeOut("slow");
+                      //changing in the side bar
+                      var temp = selff.refs.sidebar.state;
+                      console.log(selff.refs.title.state.data);
+                      temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: selff.refs.title.state.data}};
+                      selff.refs.sidebar.setState(temp);
+                      var temp = selff.state;
+                      temp.isNew = false;
+                      temp.currentType = currentTime;
+                      selff.setState(temp);
                       selff.streamAndUpdate(selff.state.currentType);
                   });
-
                 }).on('error', function(err){
+                    $(".loader").fadeOut("slow");
                     console.log(err);
                 })
             }).on('error', function(error) {
+                $(".loader").fadeOut("slow");
                 console.log("error in indexing.");
             });
-            //changing in the side bar
-            var temp = this.refs.sidebar.state;
-            console.log(this.refs.title.state.data);
-            temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: this.refs.title.state.data}};
-            this.refs.sidebar.setState(temp);
-            //TODO -- streamAndUpdate
-            // console.log("current type is");
-            // console.log(this.state.currentType);
-            //change in the state
-            var temp = this.state;
-            temp.isNew = false;
-            temp.currentType = currentTime;
-            this.setState(temp);
         }else{
             var objectToIndex = {
                 type : this.state.currentType,
@@ -380,9 +380,11 @@ export default class App extends Component {
                 $.ajax(settings).done(function (response) {
                   //TODO-check from the response if it went okay.
                   console.log(response);
+                  $(".loader").fadeOut("slow");
                 });
             }).on('error', function(error) {
                 console.log("error in indexing the new details.");
+                $(".loader").fadeOut("slow");
             });
             //start streaming
             // this.state.currentStream.stop();
@@ -430,6 +432,7 @@ export default class App extends Component {
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
+            $(".loader").fadeIn("fast");
             console.log(type);
             //$('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
             var config = {
@@ -474,8 +477,10 @@ export default class App extends Component {
                 self.setState(temp);
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
                 self.streamAndUpdate(type);
+                $(".loader").fadeOut("fast");
             }).on('error', function(err) {
-                console.log("getTypes() failed: ", err);
+                $(".loader").fadeOut("fast");
+                console.log("getting details failed ", err);
             });
         } // else over here
     }
