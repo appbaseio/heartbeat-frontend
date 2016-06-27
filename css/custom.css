@@ -70,7 +70,8 @@ span.deleteIcon:hover {
   width: 200px;
   height: 100%;
   background-color: #f8f8f8;
-  border-right: 1px solid #e7e7e7;
+  /*border-right: 1px solid #e7e7e7;*/
+  box-shadow: 3px 0px 5px #888888;
   overflow: auto;
 }
 

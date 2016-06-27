@@ -25,7 +25,8 @@ export default class App extends Component {
         changedNum: 0,
         body : "",
         exportCode : "",
-        highlightedExportCode : "Nothing to export.",
+        highlightedExportCodeJS : "Nothing to export.",
+        highlightedExportCodeCurl : "Nothing to export.",
         highlightedData : "Nothing streamed yet.",
         loadedFirstTime: true,
         isNew: true,
@@ -85,27 +86,28 @@ export default class App extends Component {
         console.log(config);
 
         //displaying the export data
-        var exportCode = '<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
-            url: 'https://scalr.api.appbase.io',\n\
-            appname: config.appname,\n\
-            username: config.username,\n\
-            password: config.password\n\});" + "\n" + "var requestObject = {\n\
-            id: \"response\",\n\
-            type: config.type,\n\
-            body: {\n\
-                query: {\n\
-                    match_all: {}\n\
-                }\n\
-            }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
-            console.log('Use the stream object.')\n\
-        }).on('error', function(error) {\n\
-            console.log('Error handling code');\n\});";
+        var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+    url: 'https://scalr.api.appbase.io',\n\
+    appname: config.appname,\n\
+    username: config.username,\n\
+    password: config.password\n\});" + "\n" + "var requestObject = {\n\
+    id: \"response\",\n\
+    type: config.type,\n\
+    body: {\n\
+        query: {\n\
+            match_all: {}\n\
+        }\n\
+    }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
+    console.log('Use the stream object.')\n\
+}).on('error', function(error) {\n\
+    console.log('Error handling code');\n\});";
 
 
-
+        var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
         var temp = this.state;
-        temp.exportCode = exportCode;
-        temp.highlightedExportCode = Prism.highlight(exportCode, Prism.languages.js);
+        temp.exportCode = exportCodeJS;
+        temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
+        temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
         this.setState(temp)
 
         //to use inside the callback of searchStream
@@ -422,7 +424,7 @@ export default class App extends Component {
             temp.changedNum = 0;
             temp.isNew = true;
             temp.currentType = type;
-            temp.highlightedExportCode = "Nothing to export.";
+            temp.highlightedExportCodeJS = "Nothing to export.";
             temp.highlightedData = "Nothing streamed yet.";
             temp.isActive = true;
             self.setState(temp);
@@ -466,7 +468,7 @@ export default class App extends Component {
                 temp.changedNum = 0;
                 temp.isNew = false;
                 temp.currentType = type;
-                temp.highlightedExportCode = "Nothing to export.";
+                temp.highlightedExportCodeJS = "Nothing to export.";
                 temp.highlightedData = "Nothing streamed yet.";
                 temp.isActive = obj.isActive;
                 self.setState(temp);
@@ -499,107 +501,110 @@ export default class App extends Component {
                     <SideBar changeTheContent={this.changeTheContent} changeTheContentAfterDeletion={this.changeTheContentAfterDeletion} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
-                    <div className="side-body">
-                        <div className="row" style={{marginTop:5}}>
-                            <GetTitle ref="title" />
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
-                                <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                    <Toggle
-                                        style = {{maxWidth:200}}
-                                        ref="isActive"
-                                        label = "Active/Inactive"
-                                        toggled = {this.state.isActive}
-                                        onToggle = {this.handleToggle}
-                                        labelStyle =  {{
-                                            //overflow:"hidden",
-                                            //maxWidth:"50%"
-                                        }}
-                                    />
-                                </MuiThemeProvider>
-                            </span>
-                            <PollingInterval ref = "pollingInterval" />
-                        </div>
-                        <div className = "row" style={{}}>
-                            <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                <TextField
-                                  hintText="http://www.exampleAPI.com/api/getUserDetails"
-                                  floatingLabelText="Type the REST API url here"
-                                  style={{width:'72%'}}
-                                  value = {this.state.restApiUrl}
-                                  onChange = {this.handleUrlChange}
-                                />
-                            </MuiThemeProvider>
-                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                    <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
-                            </MuiThemeProvider>
-                        </div>
-                        <div className = "row">
-                            <div className = "col-sm-6">
-                                <div style={{marginTop:25}}>
-                                    <ul className="nav nav-tabs">
-                                        <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                        <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
-                                        <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                        <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
-                                    </ul>
-                                    <div className="tab-content well lightWell" style={{marginTop:25}}>
-                                        <div id="params" className="tab-pane fade in active">
-                                            <GetParams ref="params" />
+                    <div className="side-body" style={{marginTop:5}}>
+                        <ul className="nav nav-tabs">
+                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint Settings</a></li>
+                            <li><a data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
+                            <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
+                        </ul>
+                        <div className="tab-content">
+                            <div id="requestSettings" className="tab-pane fade in active">
+                                <div className="row" style={{marginTop:5}}>
+                                    <GetTitle ref="title" />
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <Toggle
+                                                style = {{maxWidth:200}}
+                                                ref="isActive"
+                                                label = "Active/Inactive"
+                                                toggled = {this.state.isActive}
+                                                onToggle = {this.handleToggle}
+                                                labelStyle =  {{
+                                                    //overflow:"hidden",
+                                                    //maxWidth:"50%"
+                                                }}
+                                            />
+                                        </MuiThemeProvider>
+                                    </span>
+                                    <PollingInterval ref = "pollingInterval" />
+                                </div>
+                                <div className = "row" style={{}}>
+                                    <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
+                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                        <TextField
+                                          hintText="http://www.exampleAPI.com/api/getUserDetails"
+                                          floatingLabelText="Type the REST API url here"
+                                          style={{width:'72%'}}
+                                          value = {this.state.restApiUrl}
+                                          onChange = {this.handleUrlChange}
+                                        />
+                                    </MuiThemeProvider>
+                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
+                                    </MuiThemeProvider>
+                                </div>
+                                <div className = "row">
+                                    <div className = "col-sm-6">
+                                        <div style={{marginTop:25}}>
+                                            <ul className="nav nav-tabs">
+                                                <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                                <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
+                                                <li><a data-toggle="tab" href="#headers">Headers</a></li>
+                                                <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
+                                            </ul>
+                                            <div className="tab-content well lightWell" style={{marginTop:25}}>
+                                                <div id="params" className="tab-pane fade in active">
+                                                    <GetParams ref="params" />
+                                                </div>
+                                                <div id="auth" className="tab-pane fade">
+                                                    <GetAuthDetails ref = "authDetails" />
+                                                </div>
+                                                <div id="headers" className="tab-pane fade">
+                                                    <GetHeaders ref="headers" />
+                                                </div>
+                                                <div id="body" className="tab-pane fade">
+                                                    <GetBody ref="body" />
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div id="auth" className="tab-pane fade">
-                                            <GetAuthDetails ref = "authDetails" />
-                                        </div>
-                                        <div id="headers" className="tab-pane fade">
-                                            <GetHeaders ref="headers" />
-                                        </div>
-                                        <div id="body" className="tab-pane fade">
-                                            <GetBody ref="body" />
+                                    </div>
+                                    <div className = "col-sm-6" style={{marginTop:25}}>
+                                        <div id="response" className="">
+                                            <div className = "well" style={{marginTop:10}}>
+                                                Your JSON changed: &nbsp;
+                                                <b>{this.state.changedNum}</b> times.<br /><br />
+                                                JSON Response:<br />
+                                                <pre style={{marginTop:10}}>
+                                                    <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                                                    </code>
+                                                </pre>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className = "col-sm-6" style={{marginTop:25}}>
-                                <ul className="nav nav-tabs">
-                                    <li className="active"><a data-toggle="tab" href="#response">Response</a></li>
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <RaisedButton onClick={SelectText.bind(this,'codeToBeSelected')} data-toggle="modal" data-target="#exportCode" label="Export this stream!" primary={true} style={{maxHeight:50, marginLeft:5}} labelStyle={{fontSize:'90%'}}/>
-                                    </MuiThemeProvider>
-                                    <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
-                                </ul>
-                                <div className="tab-content">
-                                    <div id="response" className="tab-pane fade in active">
-                                        <div className = "well" style={{marginTop:10}}>
-                                            Your JSON changed: &nbsp;
-                                            <b>{this.state.changedNum}</b> times.<br /><br />
-                                            JSON Response:<br />
-                                            <pre style={{marginTop:10}}>
-                                                <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                            <div id="streamEndpoint" className="tab-pane fade">
+                                <div style={{marginTop:15,marginLeft:10, marginRight:10}}>
+                                    <ul className="nav nav-pills">
+                                        <li className="active"><a data-toggle="tab" href="#exportInCurl" className="active">{"{cURL}"}</a></li>
+                                        <li><a data-toggle="tab" href="#exportInJS">Javascript</a></li>
+                                    </ul>
+                                    <div className="tab-content" style={{marginTop:5,width:"90%"}}>
+                                        <div id = "exportInCurl" className="tab-pane fade in active">
+                                            <pre>
+                                                <code contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
                                                 </code>
                                             </pre>
                                         </div>
-                                    </div>
-                                    <div id="exportCode" className="modal fade" role = "dialog">
-                                        <div className="modal-dialog">
-                                           <div className="modal-content">
-                                             <div className="modal-header">
-                                               <button type="button" className="close" data-dismiss="modal">&times;</button>
-                                               <h4 className="modal-title">Export Code</h4>
-                                             </div>
-                                             <div className="modal-body">
-                                                 <div>
-                                                     <pre>
-                                                         <code contenteditable style={{fontSize:"75%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCode}} id="codeToBeSelected">
-                                                         </code>
-                                                     </pre>
-                                                 </div>
-                                             </div>
-                                             <div className="modal-footer">
-                                               <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-                                             </div>
-                                           </div>
-                                         </div>
+                                        <div id = "exportInJS" className="tab-pane fade">
+                                            <div id="exportCode" className="">
+                                                <pre>
+                                                    <code contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeJS}}>
+                                                    </code>
+                                                </pre>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
