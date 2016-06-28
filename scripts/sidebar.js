@@ -239,6 +239,9 @@ export default class SideBar extends Component {
               toastr.error("Error in deleting, refresh the page and try again!");
               console.log(err);
           });
+      }).error(function(){
+          $(".loader").fadeOut("slow");
+          toastr.error("Error in deleting, refresh the page and try again!");
       });
     }
 

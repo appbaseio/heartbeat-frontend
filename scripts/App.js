@@ -307,6 +307,9 @@ export default class App extends Component {
                       temp.currentType = currentTime;
                       selff.setState(temp);
                       selff.streamAndUpdate(selff.state.currentType);
+                  }).error(function(){
+                      $(".loader").fadeOut("slow");
+                      toastr.error("Error in saving, refresh the page and try again!");
                   });
                 }).on('error', function(err){
                     $(".loader").fadeOut("slow");
@@ -385,7 +388,10 @@ export default class App extends Component {
                   console.log(response);
                   $(".loader").fadeOut("slow");
                   toastr.success("Successfuly saved!");
-                });
+              }).error(function(){
+                  $(".loader").fadeOut("slow");
+                  toastr.error("Error in saving, refresh the page and try again!");
+              });
             }).on('error', function(error) {
                 console.log("error in indexing the new details.");
                 $(".loader").fadeOut("slow");
