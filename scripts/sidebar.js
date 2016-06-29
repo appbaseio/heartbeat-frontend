@@ -261,8 +261,7 @@ export default class SideBar extends Component {
                 <li className="sidebarLI smallText" key={obj._source.type} >
                     <span className="btn btn-inverse btn-disabled deleteIcon" style={{float:"right", padding:5, marginTop:8, cursor:'pointer',color:'#00BFFF'}}><i className="glyphicon glyphicon-trash"  onClick={self.deleteRequest.bind(this, obj._source.type)}></i></span>
                     <a href="#">
-                        <span className="glyphicon glyphicon-cloud"></span>
-                        <span className="smallText" onClick={self.props.changeTheContent.bind(self, obj._source.type)} >&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span className="smallText" onClick={self.props.changeTheContent.bind(self, obj._source.type)} ><span className="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     </a>
                 </li>
             );

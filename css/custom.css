@@ -8,8 +8,12 @@
 	background: url('./../img/loadingGIF.gif') 50% 50% no-repeat rgb(249,249,249);
 }
 
-span.deleteIcon:hover {
-    color:'#FF0000' !important;
+deleteIcon{
+    /*color:'#FF0000' !important;*/
+	display: none;
+}
+deleteIcon:hover{
+	display: inline;
 }
 
 #toastMessageAddNew, #streamItToast{
