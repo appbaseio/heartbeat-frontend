@@ -1,3 +1,7 @@
+/*.sidebarLI { width:100px;height:100px;float:left;position:relative; }*/
+span.deleteIcon { display:none;}
+.sidebarLI:hover span.deleteIcon { display:block; }
+
 .loader {
 	position: fixed;
 	left: 0px;
@@ -6,14 +10,6 @@
 	height: 100%;
 	z-index: 99999;
 	background: url('./../img/loadingGIF.gif') 50% 50% no-repeat rgb(249,249,249);
-}
-
-deleteIcon{
-    /*color:'#FF0000' !important;*/
-	display: none;
-}
-deleteIcon:hover{
-	display: inline;
 }
 
 #toastMessageAddNew, #streamItToast{

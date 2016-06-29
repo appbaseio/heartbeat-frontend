@@ -250,7 +250,7 @@ export default class SideBar extends Component {
         if (this.state.titlesAndTypes.length == 5){
             addNewLi = <li className="sidebarLI smallText" key="addNew" style={{background:"#EED1DE"}}><a href="#"><span className="smallText" style={{color:"#FF0072", fontSize:"85%"}}>Go Premium to have more!</span></a></li>;
         }else if (this.state.titlesAndTypes.length < 5){
-            addNewLi = <li className="sidebarLI smallText" key="addNew" onClick={this.props.changeTheContent.bind(this, 'addnew')}><a href="#"><span className="glyphicon glyphicon-plus"></span><span className="smallText">&nbsp;&nbsp;add new&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
+            addNewLi = <li className="sidebarLI smallText" key="addNew" onClick={this.props.changeTheContent.bind(this, 'addnew')}><a href="#"><span className="smallText" style={{color:"#00BFFF"}}><b><span className="glyphicon glyphicon-plus"></span>&nbsp;Add new</b>&nbsp;&nbsp;&nbsp;&nbsp;</span></a></li>;
         }else{
             addNewLi = null;
         }
@@ -259,9 +259,9 @@ export default class SideBar extends Component {
         var titlesAndTypes = this.state.titlesAndTypes.map(function(obj){
             return(
                 <li className="sidebarLI smallText" key={obj._source.type} >
-                    <span className="btn btn-inverse btn-disabled deleteIcon" style={{float:"right", padding:5, marginTop:8, cursor:'pointer',color:'#00BFFF'}}><i className="glyphicon glyphicon-trash"  onClick={self.deleteRequest.bind(this, obj._source.type)}></i></span>
+                    <span className="btn btn-inverse btn-disabled deleteIcon" style={{float:"right", padding:5, marginTop:8, cursor:'pointer',color:'#00BFFF'}}><i className="glyphicon glyphicon-remove"  onClick={self.deleteRequest.bind(this, obj._source.type)}></i></span>
                     <a href="#">
-                        <span className="smallText" onClick={self.props.changeTheContent.bind(self, obj._source.type)} ><span className="glyphicon glyphicon-pushpin"></span>&nbsp;&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span className="smallText" onClick={self.props.changeTheContent.bind(self, obj._source.type)} ><span className="glyphicon glyphicon-pushpin"></span>&nbsp;{obj._source.title}&nbsp;&nbsp;&nbsp;&nbsp;</span>
                     </a>
                 </li>
             );
