@@ -285,7 +285,7 @@ export default class SideBar extends Component {
                                 </button>
                                 <div className="brand-name-wrapper">
                                     <a className="navbar-brand" href="#">
-                                        <b>Heartbeat</b>
+                                        <img src="img/Heartbeat_Logo.svg" height={"25"} width={"100"}></img>
                                     </a>
                                 </div>
                             </div>
