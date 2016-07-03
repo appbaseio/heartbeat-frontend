@@ -32,7 +32,8 @@ export default class App extends Component {
         isNew: true,
         currentType : "addnew",
         currentStream : null,
-        isActive : true
+        isActive : true,
+        isHistorical: false
     };
 
     handleUrlChange = (e) => {
@@ -221,7 +222,8 @@ export default class App extends Component {
                 title : this.refs.title.state.data,
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
-                isActive: this.state.isActive
+                isActive: this.state.isActive,
+                isHistorical: this.state.isHistorical
                 // isNew : false
             };
             var config = {
@@ -337,7 +339,8 @@ export default class App extends Component {
                 title : this.refs.title.state.data,
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
-                isActive: this.state.isActive
+                isActive: this.state.isActive,
+                isHistorical: this.state.isHistorical
             };
             console.log(objectToIndex);
             var config = {
@@ -445,6 +448,7 @@ export default class App extends Component {
             temp.highlightedExportCodeCurl = "Nothing to export.";
             temp.highlightedData = "Nothing streamed yet.";
             temp.isActive = true;
+            temp.isHistorical = false;
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
@@ -490,6 +494,8 @@ export default class App extends Component {
                 temp.highlightedExportCodeJS = "Nothing to export.";
                 temp.highlightedData = "Nothing streamed yet.";
                 temp.isActive = obj.isActive;
+                if(obj.isHistorical) temp.isHistorical = obj.isHistorical;
+                else temp.isHistorical = false;
                 self.setState(temp);
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
                 self.streamAndUpdate(type);
@@ -506,6 +512,12 @@ export default class App extends Component {
     handleToggle = () => {
         var temp = this.state;
         temp.isActive = !temp.isActive;
+        this.setState(temp);
+    }
+
+    hanldleHistorical = () => {
+        var temp = this.state;
+        temp.isHistorical = !temp.isHistorical;
         this.setState(temp);
     }
 
@@ -543,6 +555,21 @@ export default class App extends Component {
                                                 label = "Active/Inactive"
                                                 toggled = {this.state.isActive}
                                                 onToggle = {this.handleToggle}
+                                                labelStyle =  {{
+                                                    //overflow:"hidden",
+                                                    //maxWidth:"50%"
+                                                }}
+                                            />
+                                        </MuiThemeProvider>
+                                    </span>
+                                    <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                            <Toggle
+                                                style = {{maxWidth:200}}
+                                                ref="isHistorical"
+                                                label = "Historical"
+                                                toggled = {this.state.isHistorical}
+                                                onToggle = {this.hanldleHistorical}
                                                 labelStyle =  {{
                                                     //overflow:"hidden",
                                                     //maxWidth:"50%"
