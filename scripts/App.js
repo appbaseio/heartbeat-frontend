@@ -52,10 +52,12 @@ export default class App extends Component {
         if(!this.state.isActive){
             //gif indeicator
             $("#streamingIndicator").css({"visibility":"hidden"});
+            $("#streamEndpointLink").css({"visibility":"hidden"});
             return;
         }
         //gif indeicator
         $("#streamingIndicator").css({"visibility":"visible"});
+        $("#streamEndpointLink").css({"visibility":"visible"});
         console.log("this is currentStream");
         console.log(this.state.currentStream);
         if(this.state.currentStream!=null){this.state.currentStream.stop();}
@@ -107,7 +109,8 @@ export default class App extends Component {
         var temp = this.state;
         temp.exportCode = exportCodeJS;
         temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
-        temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+        // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+        temp.highlightedExportCodeCurl = exportCodeCurl;
         this.setState(temp)
 
         //to use inside the callback of searchStream
@@ -420,6 +423,7 @@ export default class App extends Component {
     changeTheContent = (type) => {
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
+        $("#streamEndpointLink").css({"visibility":"hidden"});
         var self = this;
         if (type == "addnew") {
             $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
@@ -562,6 +566,13 @@ export default class App extends Component {
                                     <MuiThemeProvider muiTheme={getMuiTheme()}>
                                             <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                                     </MuiThemeProvider>
+                                </div>
+                                <div className="row">
+                                    <center>
+                                        <a className="btn" style={{visibility:"hidden"}} id="streamEndpointLink" href={this.state.highlightedExportCodeCurl.split(" ")[2]} target="_blank">
+                                            See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
+                                        </a>
+                                    </center>
                                 </div>
                                 <div className = "row">
                                     <div className = "col-sm-6">

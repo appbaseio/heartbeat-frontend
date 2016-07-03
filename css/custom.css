@@ -2,6 +2,11 @@
 span.deleteIcon { display:none;}
 .sidebarLI:hover span.deleteIcon { display:block; }
 
+#streamEndpointLink{
+	/*padding: 10;*/
+	margin-bottom: -20px;
+}
+
 .loader {
 	position: fixed;
 	left: 0px;
