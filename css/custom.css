@@ -1,3 +1,8 @@
+
+.side-body{
+	/*background-color:;*/
+}
+
 /*.sidebarLI { width:100px;height:100px;float:left;position:relative; }*/
 span.deleteIcon { display:none;}
 .sidebarLI:hover span.deleteIcon { display:block; }

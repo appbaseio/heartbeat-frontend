@@ -54,11 +54,16 @@ export default class App extends Component {
             //gif indeicator
             $("#streamingIndicator").css({"visibility":"hidden"});
             $("#streamEndpointLink").css({"visibility":"hidden"});
+            $("#responseArea").css({"display":"none"});
             return;
         }
         //gif indeicator
         $("#streamingIndicator").css({"visibility":"visible"});
         $("#streamEndpointLink").css({"visibility":"visible"});
+        $("#responseArea").css({"display":"block"});
+        $('html,body').animate({
+            scrollTop: $("#"+"responseArea").offset().top},
+        'slow');
         console.log("this is currentStream");
         console.log(this.state.currentStream);
         if(this.state.currentStream!=null){this.state.currentStream.stop();}
@@ -427,6 +432,7 @@ export default class App extends Component {
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
         $("#streamEndpointLink").css({"visibility":"hidden"});
+        $("#responseArea").css({"display":"none"});
         var self = this;
         if (type == "addnew") {
             $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
@@ -521,6 +527,11 @@ export default class App extends Component {
         this.setState(temp);
     }
 
+    awesomeFunction= () => {
+        // console.log("here");
+        $("#coppoc").trigger("click");
+    }
+
     render(s){
         // try{var bodyVisible = (this.refs.method.state.method == "POST" ? true : false)} catch(e){var bodyVisible = false}
         // if(bodyVisible){
@@ -539,98 +550,109 @@ export default class App extends Component {
                     <div className="side-body" style={{marginTop:5}}>
                         <ul className="nav nav-tabs">
                             <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint Settings</a></li>
-                            <li><a data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
-                            <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
+                            <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
-                                <div className="row" style={{marginTop:5}}>
-                                    <GetTitle ref="title" />
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                <div style={{}}>
+                                    <div className="row" style={{marginTop:5}}>
+                                        <GetTitle ref="title" />
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <Toggle
+                                                    style = {{maxWidth:200}}
+                                                    ref="isActive"
+                                                    label = "Active/Inactive"
+                                                    toggled = {this.state.isActive}
+                                                    onToggle = {this.handleToggle}
+                                                    labelStyle =  {{
+                                                        //overflow:"hidden",
+                                                        //maxWidth:"50%"
+                                                    }}
+                                                />
+                                            </MuiThemeProvider>
+                                        </span>
+                                        <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <Toggle
+                                                    style = {{maxWidth:200}}
+                                                    ref="isHistorical"
+                                                    label = "Historical"
+                                                    toggled = {this.state.isHistorical}
+                                                    onToggle = {this.hanldleHistorical}
+                                                    labelStyle =  {{
+                                                        //overflow:"hidden",
+                                                        //maxWidth:"50%"
+                                                    }}
+                                                />
+                                            </MuiThemeProvider>
+                                        </span>
+                                        <PollingInterval ref = "pollingInterval" />
+                                    </div>
+                                    <div className = "row" style={{}}>
+                                        <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <Toggle
-                                                style = {{maxWidth:200}}
-                                                ref="isActive"
-                                                label = "Active/Inactive"
-                                                toggled = {this.state.isActive}
-                                                onToggle = {this.handleToggle}
-                                                labelStyle =  {{
-                                                    //overflow:"hidden",
-                                                    //maxWidth:"50%"
-                                                }}
+                                            <TextField
+                                              hintText="http://www.exampleAPI.com/api/getUserDetails"
+                                              floatingLabelText="Type the REST API url here"
+                                              style={{width:'72%'}}
+                                              value = {this.state.restApiUrl}
+                                              onChange = {this.handleUrlChange}
                                             />
                                         </MuiThemeProvider>
-                                    </span>
-                                    <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <Toggle
-                                                style = {{maxWidth:200}}
-                                                ref="isHistorical"
-                                                label = "Historical"
-                                                toggled = {this.state.isHistorical}
-                                                onToggle = {this.hanldleHistorical}
-                                                labelStyle =  {{
-                                                    //overflow:"hidden",
-                                                    //maxWidth:"50%"
-                                                }}
-                                            />
+                                                <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                                         </MuiThemeProvider>
-                                    </span>
-                                    <PollingInterval ref = "pollingInterval" />
-                                </div>
-                                <div className = "row" style={{}}>
-                                    <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <TextField
-                                          hintText="http://www.exampleAPI.com/api/getUserDetails"
-                                          floatingLabelText="Type the REST API url here"
-                                          style={{width:'72%'}}
-                                          value = {this.state.restApiUrl}
-                                          onChange = {this.handleUrlChange}
-                                        />
-                                    </MuiThemeProvider>
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
-                                    </MuiThemeProvider>
-                                </div>
-                                <div className="row">
-                                    <center>
-                                        <a className="btn" style={{visibility:"hidden"}} id="streamEndpointLink" href={this.state.highlightedExportCodeCurl.split(" ")[2]} target="_blank">
-                                            See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
-                                        </a>
-                                    </center>
-                                </div>
-                                <div className = "row">
-                                    <div className = "col-sm-6">
-                                        <div style={{marginTop:25}}>
-                                            <ul className="nav nav-tabs">
-                                                <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                                <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
-                                                <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                                <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
-                                            </ul>
-                                            <div className="tab-content well lightWell" style={{marginTop:25}}>
-                                                <div id="params" className="tab-pane fade in active">
-                                                    <GetParams ref="params" />
-                                                </div>
-                                                <div id="auth" className="tab-pane fade">
-                                                    <GetAuthDetails ref = "authDetails" />
-                                                </div>
-                                                <div id="headers" className="tab-pane fade">
-                                                    <GetHeaders ref="headers" />
-                                                </div>
-                                                <div id="body" className="tab-pane fade">
-                                                    <GetBody ref="body" />
+                                    </div>
+                                    <div className = "row">
+                                        <div className = "col-sm-12">
+                                            <div style={{marginTop:25}}>
+                                                <ul className="nav nav-tabs">
+                                                    <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                                    <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
+                                                    <li><a data-toggle="tab" href="#headers">Headers</a></li>
+                                                    <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
+                                                </ul>
+                                                <div className="tab-content well lightWell" style={{marginTop:25}}>
+                                                    <div id="params" className="tab-pane fade in active">
+                                                        <GetParams ref="params" />
+                                                    </div>
+                                                    <div id="auth" className="tab-pane fade">
+                                                        <GetAuthDetails ref = "authDetails" />
+                                                    </div>
+                                                    <div id="headers" className="tab-pane fade">
+                                                        <GetHeaders ref="headers" />
+                                                    </div>
+                                                    <div id="body" className="tab-pane fade">
+                                                        <GetBody ref="body" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className = "col-sm-6" style={{marginTop:25}}>
+                                </div>
+                                <div className = "row" id="responseArea" style={{height:"100%",display:"none"}}>
+                                    <hr style={{borderTop:"solid 2px #00BFFF",borderRadius:"30"}}></hr>
+                                    <div className = "col-sm-12" style={{marginTop:25}}>
+                                        <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
+                                            style={{float:"right",height:30,width:30,visibility:"hidden"
+                                            }} />
+                                        <a className="btn btn-md" onClick={this.awesomeFunction.bind(this)} style={{float:"right",color:"#00BFFF"}}>
+                                            <b>Checkout other streaming options!</b>
+                                        </a>
                                         <div id="response" className="">
-                                            <div className = "well" style={{marginTop:10}}>
-                                                Your JSON changed: &nbsp;
-                                                <b>{this.state.changedNum}</b> times.<br /><br />
+                                            <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder"}}>
+                                                Your Stream:
+                                            </p>
+                                            <div className = "" style={{marginTop:10}}>
+                                                <p style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
+                                                    JSON changed &nbsp;
+                                                    <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                                </p>
+                                                <a className="btn btn-md" style={{visibility:"hidden",float:"right",color:"#FF0072"}} id="streamEndpointLink" href={this.state.highlightedExportCodeCurl.split(" ")[2]} target="_blank">
+                                                    See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
+                                                </a>
                                                 JSON Response:<br />
                                                 <pre style={{marginTop:10}}>
                                                     <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
