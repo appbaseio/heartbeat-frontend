@@ -212,7 +212,9 @@ export default class App extends Component {
             }
             //making the PUT request
             var currentTime = new Date().getTime().toString();
-            console.log(this.refs.sidebar.state.credentials.write);
+
+            var username = this.refs.sidebar.state.credentials.write.split(":")[0];
+            var password = this.refs.sidebar.state.credentials.write.split(":")[1];
             var settings = {
               "async": true,
               "crossDomain": true,
@@ -220,13 +222,14 @@ export default class App extends Component {
               "method": "PUT",
               "headers": {
                 "content-type": "application/json",
-                "cache-control": "no-cache"
+                "Authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
               },
               "processData": false,
               "data": "{\""+currentTime+"\": {\n      \"_ttl\": {\n          \"enabled\": true,\n          \"default\": \"6h\"\n      }\n}\n}"
             }
 
             var khud = this;
+            console.log(settings);
             $.ajax(settings).done(function (response) {
               console.log(response);
               //setting the curretType
@@ -353,7 +356,7 @@ export default class App extends Component {
 
             }).error(function(err){
                 $(".loader").fadeOut("slow");
-                toastr.error("Some error occured, try again in a moment?");
+                toastr.error("Some error occured, try refreshing the page!");
                 console.log(err);
             });
         }else{
@@ -659,7 +662,7 @@ export default class App extends Component {
                                     </div>
                                 </div>
                                 <div className = "row" id="responseArea" style={{height:"100%",display:"none"}}>
-                                    <hr style={{borderTop:"solid 2px #00BFFF",borderRadius:"30"}}></hr>
+                                    <hr style={{borderTop:"solid 2px #00BFFF",borderRadius:30}}></hr>
                                     <div className = "col-sm-12" style={{marginTop:25}}>
                                         <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
                                             style={{float:"right",height:30,width:30,visibility:"hidden"
