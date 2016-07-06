@@ -210,126 +210,151 @@ export default class App extends Component {
                 $(".loader").fadeOut("fast");
                 return;
             }
+            //making the PUT request
             var currentTime = new Date().getTime().toString();
-            //setting the curretType
-            var temp = this.state;
-            temp.currentType = currentTime;
-            this.setState(temp);
-            var objectToIndex = {
-                restApiUrl : this.state.restApiUrl,
-                type : currentTime,
-                headers : this.refs.headers.state,
-                body : this.refs.body.state,
-                params : this.refs.params.state,
-                authDetails : this.refs.authDetails.state,
-                method : this.refs.method.state.method,
-                pollingInterval : this.refs.pollingInterval.state.pollingInterval,
-                title : this.refs.title.state.data,
-                credentials : this.refs.sidebar.state.credentials,
-                appName : this.refs.sidebar.state.app_name,
-                isActive: this.state.isActive,
-                isHistorical: this.state.isHistorical
-                // isNew : false
-            };
-            var config = {
-                appname: this.refs.sidebar.state.app_name,
-                username: this.refs.sidebar.state.credentials.write.split(':')[0],
-                password: this.refs.sidebar.state.credentials.write.split(':')[1],
-                type: 'RESTAPIs'
-            };
-            var appbaseRef = new Appbase({
-                url: 'https://scalr.api.appbase.io',
-                appname: config.appname,
-                username: config.username,
-                password: config.password
-            });
-            var requestObject = {
-                type: config.type,
-                body: {
-                    type: currentTime,
-                    title: this.refs.title.state.data
-                },
-                id: currentTime, // this can be removed too, not an issue - toDiscuss
-            };
+            console.log(this.refs.sidebar.state.credentials.write);
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "https://"+this.refs.sidebar.state.credentials.write+"@scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/_mappings/"+currentTime,
+              "method": "PUT",
+              "headers": {
+                "content-type": "application/json",
+                "cache-control": "no-cache"
+              },
+              "processData": false,
+              "data": "{\""+currentTime+"\": {\n      \"_ttl\": {\n          \"enabled\": true,\n          \"default\": \"6h\"\n      }\n}\n}"
+            }
 
-            //keeping the name as self didnt work :/
-            var selff = this;
-            // console.log(self);
-            appbaseRef.index(requestObject).on('data', function(response) {
-                console.log("successfully indexed into RESTAPIs.");
-                console.log(selff);
-                var config = {
-                    appname: selff.refs.sidebar.state.app_name,
-                    username: selff.refs.sidebar.state.credentials.write.split(':')[0],
-                    password: selff.refs.sidebar.state.credentials.write.split(':')[1],
-                    type: currentTime
-                };
-                var appbaseRef = new Appbase({
-                    url: 'https://scalr.api.appbase.io',
-                    appname: config.appname,
-                    username: config.username,
-                    password: config.password
-                });
-                var requestObject = {
-                    type: config.type,
-                    id: currentTime, // it will have the title
-                    body: objectToIndex
-                };
-                appbaseRef.index(requestObject).on('data',function(res){
-                    //streamAndUpdate(currentTime); // TODO -see what.
-                    console.log(res);
-                    //sending to server now
-                    var objectToSend = {
-                        details: objectToIndex,
-                        event_type: "index"
-                    };
-                    $.ajaxSetup({
-                        type: "POST",
-                        data: {},
-                        dataType: 'json',
-                        xhrFields: {
-                           withCredentials: false
-                        },
-                        crossDomain: true
-                    });
-                    var settings = {
-                      "async": false,
-                      "crossDomain": true,
-                      "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
-                      "method": "POST",
-                      dataType: "json",
-                      "data": objectToSend
-                    }
-                    $.ajax(settings).done(function (response) {
-                      //check from the response if it went okay.
-                      console.log(response);
-                      //streaming only after server responds
-                      console.log(selff);
-                      $(".loader").fadeOut("slow");
-                      toastr.success("Succesfully added!");
-                      //changing in the side bar
-                      var temp = selff.refs.sidebar.state;
-                      console.log(selff.refs.title.state.data);
-                      temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: selff.refs.title.state.data}};
-                      selff.refs.sidebar.setState(temp);
-                      var temp = selff.state;
-                      temp.isNew = false;
-                      temp.currentType = currentTime;
-                      selff.setState(temp);
-                      selff.streamAndUpdate(selff.state.currentType);
-                  }).error(function(){
-                      $(".loader").fadeOut("slow");
-                      toastr.error("Error in saving, refresh the page and try again!");
+            var khud = this;
+            $.ajax(settings).done(function (response) {
+              console.log(response);
+              //setting the curretType
+              var temp = khud.state;
+              temp.currentType = currentTime;
+              khud.setState(temp);
+              var objectToIndex = {
+                  restApiUrl : khud.state.restApiUrl,
+                  type : currentTime,
+                  headers : khud.refs.headers.state,
+                  body : khud.refs.body.state,
+                  params : khud.refs.params.state,
+                  authDetails : khud.refs.authDetails.state,
+                  method : khud.refs.method.state.method,
+                  pollingInterval : khud.refs.pollingInterval.state.pollingInterval,
+                  title : khud.refs.title.state.data,
+                  credentials : khud.refs.sidebar.state.credentials,
+                  appName : khud.refs.sidebar.state.app_name,
+                  isActive: khud.state.isActive,
+                  isHistorical: khud.state.isHistorical,
+                  "ttl": "999d"
+                  // isNew : false
+              };
+              var config = {
+                  appname: khud.refs.sidebar.state.app_name,
+                  username: khud.refs.sidebar.state.credentials.write.split(':')[0],
+                  password: khud.refs.sidebar.state.credentials.write.split(':')[1],
+                  type: 'RESTAPIs'
+              };
+              var appbaseRef = new Appbase({
+                  url: 'https://scalr.api.appbase.io',
+                  appname: config.appname,
+                  username: config.username,
+                  password: config.password
+              });
+              var requestObject = {
+                  type: config.type,
+                  body: {
+                      type: currentTime,
+                      title: khud.refs.title.state.data
+                  },
+                  id: currentTime, // this can be removed too, not an issue - toDiscuss
+              };
+
+              //keeping the name as self didnt work :/
+              var selff = khud;
+              // console.log(self);
+              appbaseRef.index(requestObject).on('data', function(response) {
+                  console.log("successfully indexed into RESTAPIs.");
+                  console.log(selff);
+                  var config = {
+                      appname: selff.refs.sidebar.state.app_name,
+                      username: selff.refs.sidebar.state.credentials.write.split(':')[0],
+                      password: selff.refs.sidebar.state.credentials.write.split(':')[1],
+                      type: currentTime
+                  };
+                  var appbaseRef = new Appbase({
+                      url: 'https://scalr.api.appbase.io',
+                      appname: config.appname,
+                      username: config.username,
+                      password: config.password
                   });
-                }).on('error', function(err){
-                    $(".loader").fadeOut("slow");
-                    toastr.error("Some error occured, try again in a moment?");
-                    console.log(err);
-                })
-            }).on('error', function(error) {
+                  var requestObject = {
+                      type: config.type,
+                      id: currentTime, // it will have the title
+                      body: objectToIndex
+                  };
+                  appbaseRef.index(requestObject).on('data',function(res){
+                      //streamAndUpdate(currentTime); // TODO -see what.
+                      console.log(res);
+                      //sending to server now
+                      var objectToSend = {
+                          details: objectToIndex,
+                          event_type: "index"
+                      };
+                      $.ajaxSetup({
+                          type: "POST",
+                          data: {},
+                          dataType: 'json',
+                          xhrFields: {
+                             withCredentials: false
+                          },
+                          crossDomain: true
+                      });
+                      var settings = {
+                        "async": false,
+                        "crossDomain": true,
+                        "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
+                        "method": "POST",
+                        dataType: "json",
+                        "data": objectToSend
+                      }
+                      $.ajax(settings).done(function (response) {
+                        //check from the response if it went okay.
+                        console.log(response);
+                        //streaming only after server responds
+                        console.log(selff);
+                        $(".loader").fadeOut("slow");
+                        toastr.success("Succesfully added!");
+                        //changing in the side bar
+                        var temp = selff.refs.sidebar.state;
+                        console.log(selff.refs.title.state.data);
+                        temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: selff.refs.title.state.data}};
+                        selff.refs.sidebar.setState(temp);
+                        var temp = selff.state;
+                        temp.isNew = false;
+                        temp.currentType = currentTime;
+                        selff.setState(temp);
+                        selff.streamAndUpdate(selff.state.currentType);
+                    }).error(function(){
+                        $(".loader").fadeOut("slow");
+                        toastr.error("Error in saving, refresh the page and try again!");
+                    });
+                  }).on('error', function(err){
+                      $(".loader").fadeOut("slow");
+                      toastr.error("Some error occured, try again in a moment?");
+                      console.log(err);
+                  })
+              }).on('error', function(error) {
+                  $(".loader").fadeOut("slow");
+                  toastr.error("Some error occured, try again in a moment?");
+                  console.log("error in indexing.");
+              });
+
+            }).error(function(err){
                 $(".loader").fadeOut("slow");
                 toastr.error("Some error occured, try again in a moment?");
-                console.log("error in indexing.");
+                console.log(err);
             });
         }else{
             var objectToIndex = {
@@ -345,7 +370,8 @@ export default class App extends Component {
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
                 isActive: this.state.isActive,
-                isHistorical: this.state.isHistorical
+                isHistorical: this.state.isHistorical,
+                "ttl":"999d"
             };
             console.log(objectToIndex);
             var config = {
