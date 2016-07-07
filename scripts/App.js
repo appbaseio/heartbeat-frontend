@@ -164,42 +164,6 @@ export default class App extends Component {
         }).on('error', function(err){
             console.log(err);
         });
-        //indexing a dummy so that getStream doesnt give an error
-        // appbaseRef.index(requestObject).on('data',function(res){
-        //
-        //     var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-        //         //displaying the updated json data
-        //         var temp = self.state;
-        //         temp.data = JSON.stringify(stream._source, null, 4);
-        //         temp.changedNum = temp.changedNum + 1;
-        //         temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-        //         self.setState(temp);
-        //     }).on('error', function(error) {
-        //         console.log("Query error: ", JSON.stringify(error))
-        //     });
-        //
-        //     var temp = self.state;
-        //     temp.currentStream = currentStream;
-        //     self.setState(temp);
-        // }).on('error',function(err){
-        //     console.log("error in indexing the dummy"+err);
-        // });
-
-        // var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-        //     //displaying the updated json data
-        //     var temp = self.state;
-        //     temp.data = JSON.stringify(stream._source, null, 4);
-        //     temp.changedNum = temp.changedNum + 1;
-        //     temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-        //     self.setState(temp);
-        // }).on('error', function(error) {
-        //     console.log("Query error: ", JSON.stringify(error))
-        // });
-        //
-        // var temp = this.state;
-        // temp.currentStream = currentStream;
-        // this.setState(temp);
-
     };
 
     submitAndStream = () => {
@@ -229,7 +193,6 @@ export default class App extends Component {
             }
 
             var khud = this;
-            console.log(settings);
             $.ajax(settings).done(function (response) {
               console.log(response);
               //setting the curretType
@@ -249,8 +212,7 @@ export default class App extends Component {
                   credentials : khud.refs.sidebar.state.credentials,
                   appName : khud.refs.sidebar.state.app_name,
                   isActive: khud.state.isActive,
-                  isHistorical: khud.state.isHistorical,
-                  "ttl": "999d"
+                  isHistorical: khud.state.isHistorical
                   // isNew : false
               };
               var config = {
@@ -278,28 +240,19 @@ export default class App extends Component {
               var selff = khud;
               // console.log(self);
               appbaseRef.index(requestObject).on('data', function(response) {
-                  console.log("successfully indexed into RESTAPIs.");
-                  console.log(selff);
-                  var config = {
-                      appname: selff.refs.sidebar.state.app_name,
-                      username: selff.refs.sidebar.state.credentials.write.split(':')[0],
-                      password: selff.refs.sidebar.state.credentials.write.split(':')[1],
-                      type: currentTime
-                  };
-                  var appbaseRef = new Appbase({
-                      url: 'https://scalr.api.appbase.io',
-                      appname: config.appname,
-                      username: config.username,
-                      password: config.password
-                  });
-                  var requestObject = {
-                      type: config.type,
-                      id: currentTime, // it will have the title
-                      body: objectToIndex
-                  };
-                  appbaseRef.index(requestObject).on('data',function(res){
-                      //streamAndUpdate(currentTime); // TODO -see what.
-                      console.log(res);
+                console.log("successfully indexed into RESTAPIs.");
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://scalr.api.appbase.io/"+selff.refs.sidebar.state.app_name+"/"+currentTime+"/"+currentTime+"/?ttl=999d",
+                    "method": "PUT",
+                    "headers": {
+                      "content-type": "application/json",
+                      "authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
+                    },
+                    "data":JSON.stringify(objectToIndex)
+                };
+                $.ajax(settings).done(function(){
                       //sending to server now
                       var objectToSend = {
                           details: objectToIndex,
@@ -322,6 +275,7 @@ export default class App extends Component {
                         dataType: "json",
                         "data": objectToSend
                       }
+                      //sending the backend
                       $.ajax(settings).done(function (response) {
                         //check from the response if it went okay.
                         console.log(response);
@@ -343,17 +297,16 @@ export default class App extends Component {
                         $(".loader").fadeOut("slow");
                         toastr.error("Error in saving, refresh the page and try again!");
                     });
-                  }).on('error', function(err){
-                      $(".loader").fadeOut("slow");
-                      toastr.error("Some error occured, try again in a moment?");
-                      console.log(err);
-                  })
+                }).error(function(err){
+                    $(".loader").fadeOut("slow");
+                    toastr.error("Some error occured, try again in a moment?");
+                    console.log(err);
+                });
               }).on('error', function(error) {
                   $(".loader").fadeOut("slow");
                   toastr.error("Some error occured, try again in a moment?");
                   console.log("error in indexing.");
               });
-
             }).error(function(err){
                 $(".loader").fadeOut("slow");
                 toastr.error("Some error occured, try refreshing the page!");
@@ -373,33 +326,24 @@ export default class App extends Component {
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
                 isActive: this.state.isActive,
-                isHistorical: this.state.isHistorical,
-                "ttl":"999d"
+                isHistorical: this.state.isHistorical
             };
-            console.log(objectToIndex);
-            var config = {
-                appname: this.refs.sidebar.state.app_name,
-                username: this.refs.sidebar.state.credentials.write.split(':')[0],
-                password: this.refs.sidebar.state.credentials.write.split(':')[1],
-                type: this.state.currentType
+            var username = this.refs.sidebar.state.credentials.write.split(":")[0];
+            var password = this.refs.sidebar.state.credentials.write.split(":")[1];
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/"+this.state.currentType+"/"+this.state.currentType+"/?ttl=999d",
+                "method": "PUT",
+                "headers": {
+                  "content-type": "application/json",
+                  "authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
+                },
+                "data":JSON.stringify(objectToIndex)
             };
-            var appbaseRef = new Appbase({
-                url: 'https://scalr.api.appbase.io',
-                appname: config.appname,
-                username: config.username,
-                password: config.password
-            });
-            var requestObject = {
-                type: config.type,
-                id: config.type,
-                body: objectToIndex
-            };
-
-            //var streamAndUpdate = this.streamAndUpdate; // TODO -alag se save button and stream button
             var self = this;
-            appbaseRef.index(requestObject).on('data', function(response) {
+            $.ajax(settings).done(function(){
                 console.log("successfully indexed the new details");
-                //streamAndUpdate(currentTime); // TODO -see what.
                 //sending to server now
                 var objectToSend = {
                     details: objectToIndex,
@@ -432,13 +376,12 @@ export default class App extends Component {
                   $(".loader").fadeOut("slow");
                   toastr.error("Error in saving, refresh the page and try again!");
               });
-            }).on('error', function(error) {
+            }).error(function(){
                 console.log("error in indexing the new details.");
                 $(".loader").fadeOut("slow");
                 toastr.error("Some error occured, try again in a moment?");
             });
-            //start streaming
-            // this.state.currentStream.stop();
+
             this.streamAndUpdate(this.state.currentType);
 
             //emptying the json data part
