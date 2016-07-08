@@ -142,6 +142,7 @@ var appbaseRef = new Appbase({\n\
 var requestObject = {\n\
     type: config.type,\n\
     body: {\n\
+        size: 300,\n\
         query: {\n\
             "bool": {\n\
                 "must_not": [{\n\
@@ -170,7 +171,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
 });'
 
 
-            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"query\":"+query+"}'";
+            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"size\":500,\"query\":"+query+"}'";
             var temp = this.state;
             temp.exportCodeJS = exportCodeJS;
             temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
@@ -233,7 +234,6 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
             var temp = this.state;
             temp.exportCodeJS = exportCodeJS;
             temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
-            // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
             temp.exportCodeCurl = exportCodeCurl;
             temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
             this.setState(temp)
