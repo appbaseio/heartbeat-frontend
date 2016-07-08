@@ -24,7 +24,8 @@ export default class App extends Component {
         data : "",
         changedNum: 0,
         body : "",
-        exportCode : "",
+        exportCodeJS : "",
+        exportCodeCurl : "",
         highlightedExportCodeJS : "Nothing to export.",
         highlightedExportCodeCurl : "Nothing to export.",
         highlightedData : "Nothing streamed yet.",
@@ -63,11 +64,13 @@ export default class App extends Component {
         $("#responseArea").css({"display":"block"});
         $('html,body').animate({
             scrollTop: $("#"+"responseArea").offset().top},
-        'slow');
-        console.log("this is currentStream");
-        console.log(this.state.currentStream);
-        if(this.state.currentStream!=null){this.state.currentStream.stop();}
-        console.log(type);
+        'slow');;
+        // if(this.state.currentStream!=null){this.state.currentStream.stop();}
+        try{
+            this.state.currentStream.stop();
+        }catch(err){
+            console.log("no current stream");
+        }
         var config = {
             appname: this.refs.sidebar.state.app_name,
             username: this.refs.sidebar.state.credentials.write.split(':')[0],
@@ -80,69 +83,168 @@ export default class App extends Component {
             username: config.username,
             password: config.password
         });
-
-        var requestObject = {
-            id: "response",
-            type: config.type,
-            body: {
-                query: {
-                    match_all: {}
+        if(this.state.isHistorical){
+            $("#streamEndpointLink").css({"visibility":"hidden"});
+            var requestObject = {
+                type: config.type,
+                body: {
+                    query: {
+                        match_all: {}
+                    }
                 }
-            }
-        };
+            };
 
-        console.log(config);
+            var query = {
+                "bool": {
+                  "must_not": [
+                    {
+                      "ids": {
+                        "type": this.state.currentType,
+                        "values": ["details"]
+                      }
+                    }
+                  ]
+                }
+            };
+            query = JSON.stringify(query,null,4);
 
-        //displaying the export data
-        var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
-    url: 'https://scalr.api.appbase.io',\n\
+            //displaying the export data
+    //         var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+    //     url: 'https://scalr.api.appbase.io',\n\
+    //     appname: config.appname,\n\
+    //     username: config.username,\n\
+    //     password: config.password\n\});" + "\n" + "var requestObject = {\n\
+    //     type: config.type,\n\
+    //     body: {\n\t"+"query: "+query+"\n\};" + "\n" +"//to get the stream of updates on the endpoint, use this\n"+"appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
+    //     console.log('Use the stream object.');\n\
+    // }).on('error', function(error) {\n\
+    //     console.log('Error handling code');\n\});\
+    //     \n"+"//to get the historical data, use this\n"+"appbaseRef.search(requestObject).on('data', function(res) {\n\
+    //     console.log(res.hits.hits);\n\
+    // }).on('error', function(error) {\n\
+    //     console.log('Error handling code');\n\});";
+
+
+var exportCodeJS = '//include this script tag in your html\n\
+//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>\n\
+var config = {\n\
+    "appname": "'+this.refs.sidebar.state.app_name+'",\n\
+    "username": "'+ this.refs.sidebar.state.credentials.write.split(':')[0]+'",\n\
+    "password": "'+ this.refs.sidebar.state.credentials.write.split(':')[1]+'",\n\
+    "type": "'+this.state.currentType+'"\n\
+};\n\
+var appbaseRef = new Appbase({\n\
+    url: "https://scalr.api.appbase.io",\n\
     appname: config.appname,\n\
     username: config.username,\n\
-    password: config.password\n\});" + "\n" + "var requestObject = {\n\
-    id: \"response\",\n\
+    password: config.password\n\
+});\n\
+var requestObject = {\n\
     type: config.type,\n\
     body: {\n\
         query: {\n\
-            match_all: {}\n\
+            "bool": {\n\
+                "must_not": [{\n\
+                    "ids": {\n\
+                        "type": "'+this.state.currentType+'",\n\
+                        "values": [\n\
+                            "details"\n\
+                        ]\n\
+                    }\n\
+                }]\n\
+            }\n\
         }\n\
-    }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
-    console.log('Use the stream object.')\n\
-}).on('error', function(error) {\n\
-    console.log('Error handling code');\n\});";
+    }\n\
+};\n\
+//to get the stream of updates on the endpoint, use this\n\
+appbaseRef.searchStream(requestObject).on("data", function(stream) {\n\
+    console.log("Use the stream object.");\n\
+}).on("error", function(error) {\n\
+    console.log("Error handling code");\n\
+});\n\
+//to get the historical data, use this\n\
+appbaseRef.search(requestObject).on("data", function(res) {\n\
+    console.log(res.hits.hits);\n\
+}).on("error", function(error) {\n\
+    console.log("Error handling code");\n\
+});'
 
 
-        var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
-        var temp = this.state;
-        temp.exportCode = exportCodeJS;
-        temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
-        // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
-        temp.highlightedExportCodeCurl = exportCodeCurl;
-        this.setState(temp)
+            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"query\":"+query+"}'";
+            var temp = this.state;
+            temp.exportCodeJS = exportCodeJS;
+            temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
+            // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            temp.exportCodeCurl = exportCodeCurl;
+            temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            this.setState(temp)
 
-        //to use inside the callback of searchStream
-        var a = this.state;
-        var f = this.setState;
-        var self = this;
+            //to use inside the callback of searchStream
+            var a = this.state;
+            var f = this.setState;
+            var self = this;
 
-
-        appbaseRef.get(requestObject).on('data', function(res){
-            if(res.found){
-                var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-                    //displaying the updated json data
-                    var temp = self.state;
-                    temp.data = JSON.stringify(stream._source, null, 4);
-                    temp.changedNum = temp.changedNum + 1;
-                    temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-                    self.setState(temp);
-                }).on('error', function(error) {
-                    console.log("Query error: ", JSON.stringify(error))
-                });
-
+            var currentStream = appbaseRef.searchStream(requestObject).on('data', function(stream) {
+                //displaying the updated json data
                 var temp = self.state;
-                temp.currentStream = currentStream;
+                temp.data = JSON.stringify(stream._source, null, 4);
+                temp.changedNum = temp.changedNum + 1;
+                temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
                 self.setState(temp);
-            }else{
-                appbaseRef.index(requestObject).on('data',function(res){
+            }).on('error', function(error) {
+                console.log("Query error: ", JSON.stringify(error))
+            });
+
+            var temp = self.state;
+            temp.currentStream = currentStream;
+            temp.data = JSON.stringify({"Message":"The polling has started, you will see your responses soon!"}, null, 4);
+            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+            self.setState(temp);
+        }else{
+            $("#streamEndpointLink").css({"visibility":"visible"});
+            var requestObject = {
+                id: "response",
+                type: config.type,
+                body: {
+                    query: {
+                        match_all: {}
+                    }
+                }
+            };
+            //displaying the export data
+            var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+        url: 'https://scalr.api.appbase.io',\n\
+        appname: config.appname,\n\
+        username: config.username,\n\
+        password: config.password\n\});" + "\n" + "var requestObject = {\n\
+        id: \"response\",\n\
+        type: config.type,\n\
+        body: {\n\
+            query: {\n\
+                match_all: {}\n\
+            }\n\
+        }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
+        console.log('Use the stream object.')\n\
+    }).on('error', function(error) {\n\
+        console.log('Error handling code');\n\});";
+
+
+            var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
+            var temp = this.state;
+            temp.exportCodeJS = exportCodeJS;
+            temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
+            // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            temp.exportCodeCurl = exportCodeCurl;
+            temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            this.setState(temp)
+
+            //to use inside the callback of searchStream
+            var a = this.state;
+            var f = this.setState;
+            var self = this;
+
+            appbaseRef.get(requestObject).on('data', function(res){
+                if(res.found){
                     var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
                         //displaying the updated json data
                         var temp = self.state;
@@ -156,14 +258,36 @@ export default class App extends Component {
 
                     var temp = self.state;
                     temp.currentStream = currentStream;
+                    temp.data = JSON.stringify(res._source, null, 4);
+                    temp.changedNum = temp.changedNum + 1;
+                    temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
                     self.setState(temp);
-                }).on('error',function(err){
-                    console.log("error in indexing the dummy"+err);
-                });
-            }
-        }).on('error', function(err){
-            console.log(err);
-        });
+                }else{
+                    appbaseRef.index(requestObject).on('data',function(res){
+                        var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+                            //displaying the updated json data
+                            var temp = self.state;
+                            temp.data = JSON.stringify(stream._source, null, 4);
+                            temp.changedNum = temp.changedNum + 1;
+                            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                            self.setState(temp);
+                        }).on('error', function(error) {
+                            console.log("Query error: ", JSON.stringify(error))
+                        });
+
+                        var temp = self.state;
+                        temp.currentStream = currentStream;
+                        temp.data = JSON.stringify({"Message":"The polling has started, you will see your responses soon!"}, null, 4);
+                        temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                        self.setState(temp);
+                    }).on('error',function(err){
+                        console.log("error in indexing the dummy"+err);
+                    });
+                }
+            }).on('error', function(err){
+                console.log(err);
+            });
+        }
     };
 
     submitAndStream = () => {
@@ -244,7 +368,7 @@ export default class App extends Component {
                 var settings = {
                     "async": true,
                     "crossDomain": true,
-                    "url": "https://scalr.api.appbase.io/"+selff.refs.sidebar.state.app_name+"/"+currentTime+"/"+currentTime+"/?ttl=999d",
+                    "url": "https://scalr.api.appbase.io/"+selff.refs.sidebar.state.app_name+"/"+currentTime+"/details/?ttl=999d",
                     "method": "PUT",
                     "headers": {
                       "content-type": "application/json",
@@ -333,7 +457,7 @@ export default class App extends Component {
             var settings = {
                 "async": true,
                 "crossDomain": true,
-                "url": "https://scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/"+this.state.currentType+"/"+this.state.currentType+"/?ttl=999d",
+                "url": "https://scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/"+this.state.currentType+"/details/?ttl=999d",
                 "method": "PUT",
                 "headers": {
                   "content-type": "application/json",
@@ -417,7 +541,7 @@ export default class App extends Component {
             self.refs.params.setState({keyValuePairs : []});
             var temp = self.state;
             temp.restApiUrl = "";
-            temp.exportCode = "";
+            temp.exportCodeJS = "";
             temp.data = "";
             temp.changedNum = 0;
             temp.isNew = true;
@@ -447,7 +571,7 @@ export default class App extends Component {
             });
             var requestObject = {
                 type: config.type,
-                id: type
+                id: "details"
             };
             appbaseRef.get(requestObject).on('data', function(res) {
                 // console.log('here');
@@ -464,7 +588,7 @@ export default class App extends Component {
                 self.refs.params.setState(obj.params);
                 var temp = self.state;
                 temp.restApiUrl = obj.restApiUrl;
-                temp.exportCode = "";
+                temp.exportCodeJS = "";
                 temp.data = "";
                 temp.changedNum = 0;
                 temp.isNew = false;
@@ -505,29 +629,24 @@ export default class App extends Component {
     }
 
     render(s){
-        // try{var bodyVisible = (this.refs.method.state.method == "POST" ? true : false)} catch(e){var bodyVisible = false}
-        // if(bodyVisible){
-        //     var bodyElement = <li><a data-toggle="tab" href="#body">Body</a></li>;
-        //     console.log(bodyElement);
-        // }else{
-        //     bodyElement = null;
-        //     console.log('no body');
-        // }
         return (
             <div>
                 <div>
                     <SideBar changeTheContent={this.changeTheContent} changeTheContentAfterDeletion={this.changeTheContentAfterDeletion} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
-                    <div className="side-body" style={{marginTop:5}}>
+                    <div className="side-body" style={{marginTop:5,paddingLeft:5}}>
                         <ul className="nav nav-tabs">
-                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint Settings</a></li>
+                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
                             <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
-                                <div style={{}}>
+                                <div  className="" style={{boxShadow:"-3px 2px 5px #00BFFF", marginTop:20}}>
                                     <div className="row" style={{marginTop:5}}>
+                                        <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder",marginTop:10}}>
+                                            &nbsp;&nbsp;Settings:
+                                        </p>
                                         <GetTitle ref="title" />
                                         &nbsp;&nbsp;&nbsp;&nbsp;
                                         <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
@@ -605,31 +724,32 @@ export default class App extends Component {
                                     </div>
                                 </div>
                                 <div className = "row" id="responseArea" style={{height:"100%",display:"none"}}>
-                                    <hr style={{borderTop:"solid 2px #00BFFF",borderRadius:30}}></hr>
-                                    <div className = "col-sm-12" style={{marginTop:25}}>
-                                        <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
-                                            style={{float:"right",height:30,width:30,visibility:"hidden"
-                                            }} />
-                                        <a className="btn btn-md" onClick={this.awesomeFunction.bind(this)} style={{float:"right",color:"#00BFFF"}}>
-                                            <b>Checkout other streaming options!</b>
-                                        </a>
-                                        <div id="response" className="">
-                                            <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder"}}>
-                                                Your Stream:
-                                            </p>
-                                            <div className = "" style={{marginTop:10}}>
-                                                <p style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
-                                                    JSON changed &nbsp;
-                                                    <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                    <div>
+                                        <div className = "col-sm-12" style={{boxShadow:"-3px 2px 5px #FF0072", marginTop:25}}>
+                                            <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
+                                                style={{float:"right",height:30,width:30,visibility:"hidden",marginTop:5
+                                                }} />
+                                            <div id="response" className="">
+                                                <p className="lead" style={{color:"#FF0072",fontWeight:"bolder",marginTop:10}}>
+                                                    Your Stream:
                                                 </p>
-                                                <a className="btn btn-md" style={{visibility:"hidden",float:"right",color:"#FF0072"}} id="streamEndpointLink" href={this.state.highlightedExportCodeCurl.split(" ")[2]} target="_blank">
-                                                    See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
-                                                </a>
-                                                JSON Response:<br />
-                                                <pre style={{marginTop:10}}>
-                                                    <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
-                                                    </code>
-                                                </pre>
+                                                <div className = "" style={{marginTop:25}}>
+                                                    <div style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
+                                                        <a className="btn btn-md blink_me" onClick={this.awesomeFunction.bind(this)} style={{float:"right",color:"#00BFFF"}}>
+                                                            <b>Checkout other streaming options!</b>
+                                                        </a>
+                                                        JSON changed &nbsp;
+                                                        <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                                    </div>
+                                                    <pre style={{marginTop:10,boxShadow:"-3px 0px 3px #FF0072",borderRadius:5}}>
+                                                        <a className="btn btn-sm" style={{float:"right",color:"#FF0072",animation:"blinker 1s linear infinite"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
+                                                            See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
+                                                        </a>
+                                                        <span className="badge">JSON Response:</span><br />
+                                                        <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                                                        </code>
+                                                    </pre>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -643,15 +763,21 @@ export default class App extends Component {
                                     </ul>
                                     <div className="tab-content" style={{marginTop:5,width:"90%"}}>
                                         <div id = "exportInCurl" className="tab-pane fade in active">
-                                            <pre>
-                                                <button className="copybtn btn btn-md btn-info" data-clipboard-target="#curlcode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
-                                                <code id="curlcode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
-                                                </code>
-                                            </pre>
+                                            <div>
+                                                <pre style={{boxShadow:"-3px 1px 3px #00BFFF",marginTop:10}}>
+                                                    <button className="copybtn btn btn-md btn-info" data-clipboard-target="#curlcode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
+                                                    <code id="curlcode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
+                                                    </code>
+                                                </pre>
+                                            </div>
+                                            <div className="" style={{color:"#FF0072",fontSize:"80%"}}>
+                                            NOTE: Copy and paste this code into a terminal to see the historical data; the streaming of new responses will start automatically after that.
+                                            To have only the historical data, remove the "stream=true" URL parameter from the cURL request.
+                                            </div>
                                         </div>
                                         <div id = "exportInJS" className="tab-pane fade">
                                             <div id="exportCode" className="">
-                                                <pre>
+                                                <pre style={{boxShadow:"-3px 1px 3px #00BFFF"}}>
                                                     <button className="copybtn btn btn-md btn-info" data-clipboard-target="#jscode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
                                                     <code id="jscode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeJS}}>
                                                     </code>

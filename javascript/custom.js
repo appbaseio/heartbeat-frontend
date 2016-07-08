@@ -19,3 +19,10 @@ $(function () {
 
     });
 });
+
+function blinker() {
+    $('.blink_me').fadeOut(250);
+    $('.blink_me').fadeIn(250);
+}
+
+setInterval(blinker, 1000);
