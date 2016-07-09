@@ -40,7 +40,7 @@ export default class KeyValue extends Component {
                     <TextField
                       hintText="Enter Key"
                       floatingLabelText="KEY"
-                      style={{maxWidth:'35%'}}
+                      style={{width:'40%'}}
                       hintStyle={{fontSize:'90%'}}
                       inputStyle={{fontSize:'90%'}}
                       value = {this.state.key}
@@ -52,7 +52,7 @@ export default class KeyValue extends Component {
                     <TextField
                       hintText="Enter Value"
                       floatingLabelText="VALUE"
-                      style={{maxWidth:'35%'}}
+                      style={{width:'40%'}}
                       hintStyle={{fontSize:'90%'}}
                       inputStyle={{fontSize:'90%'}}
                       value = {this.state.value}

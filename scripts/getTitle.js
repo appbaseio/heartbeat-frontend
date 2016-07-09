@@ -29,7 +29,7 @@ export default class GetTitle extends Component {
                 <TextField
                 onChange = {this.handleStateChange}
                   hintText = "Name this stream"
-                  style={{maxWidth:'60%',width:'55%', marginLeft:15}}
+                  style={{maxWidth:'70%',width:'65%', marginLeft:15}}
                   value = {this.state.data}
                   floatingLabelFixed = {true}
                   floatingLabelText = "Stream Name"

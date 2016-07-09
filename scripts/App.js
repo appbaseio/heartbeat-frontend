@@ -62,9 +62,6 @@ export default class App extends Component {
         $("#streamingIndicator").css({"visibility":"visible"});
         $("#streamEndpointLink").css({"visibility":"visible"});
         $("#responseArea").css({"display":"block"});
-        $('html,body').animate({
-            scrollTop: $("#"+"responseArea").offset().top},
-        'slow');;
         // if(this.state.currentStream!=null){this.state.currentStream.stop();}
         try{
             this.state.currentStream.stop();
@@ -212,6 +209,13 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                     }
                 }
             };
+            var fishy = {
+                id: "response",
+                type: config.type,
+                body: {
+                    "message": "Your request has been added, the polling will start soon!"
+                }
+            };
             //displaying the export data
             var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
         url: 'https://scalr.api.appbase.io',\n\
@@ -263,7 +267,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                     temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
                     self.setState(temp);
                 }else{
-                    appbaseRef.index(requestObject).on('data',function(res){
+                    appbaseRef.index(fishy).on('data',function(res){
                         var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
                             //displaying the updated json data
                             var temp = self.state;
@@ -288,6 +292,9 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 console.log(err);
             });
         }
+        $('html,body').animate({
+            scrollTop: $("#"+"responseArea").offset().top},
+        'slow');;
     };
 
     submitAndStream = () => {
@@ -524,7 +531,8 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         }
     }
 
-    changeTheContent = (type) => {
+    changeTheContent = (type,element) => {
+        $(".customHighlight").removeClass("customHighlight");
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
         $("#streamEndpointLink").css({"visibility":"hidden"});
@@ -555,6 +563,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
             $(".loader").fadeIn("fast");
+            $(element.target).addClass("customHighlight");
             console.log(type);
             //$('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
             var config = {
@@ -602,7 +611,8 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
                 self.streamAndUpdate(type);
                 $(".loader").fadeOut("fast");
-                toastr.success("Successfully loaded!");
+                // toastr.success("Successfully loaded!");
+                toastr.info("Dont forget to hit Save after you change anything!!");
             }).on('error', function(err) {
                 $(".loader").fadeOut("fast");
                 toastr.error("Some error occured, try back in a moment?");
@@ -649,7 +659,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                         </p>
                                         <GetTitle ref="title" />
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                        <span style={{float:"right",maxWidth:'20%', marginTop:50, marginRight:16}}>
                                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                                 <Toggle
                                                     style = {{maxWidth:200}}
@@ -657,21 +667,6 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                                     label = "Active/Inactive"
                                                     toggled = {this.state.isActive}
                                                     onToggle = {this.handleToggle}
-                                                    labelStyle =  {{
-                                                        //overflow:"hidden",
-                                                        //maxWidth:"50%"
-                                                    }}
-                                                />
-                                            </MuiThemeProvider>
-                                        </span>
-                                        <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
-                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                                <Toggle
-                                                    style = {{maxWidth:200}}
-                                                    ref="isHistorical"
-                                                    label = "Historical"
-                                                    toggled = {this.state.isHistorical}
-                                                    onToggle = {this.hanldleHistorical}
                                                     labelStyle =  {{
                                                         //overflow:"hidden",
                                                         //maxWidth:"50%"
@@ -727,17 +722,30 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                     <div>
                                         <div className = "col-sm-12" style={{boxShadow:"-3px 2px 5px #FF0072", marginTop:25}}>
                                             <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
-                                                style={{float:"right",height:30,width:30,visibility:"hidden",marginTop:5
-                                                }} />
+                                                style={{float:"right",height:30,width:30,visibility:"hidden",marginTop:5}}></img>
+                                            <span style={{float:"right",maxWidth:'20%', marginTop:10, marginRight:50}}>
+                                                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                    <Toggle
+                                                        style = {{minWidth:140}}
+                                                        ref="isHistorical"
+                                                        label = "Keep history"
+                                                        toggled = {this.state.isHistorical}
+                                                        onToggle = {this.hanldleHistorical}
+                                                        labelStyle =  {{
+                                                            fontSize:"100%"
+                                                        }}
+                                                    />
+                                                </MuiThemeProvider>
+                                            </span>
                                             <div id="response" className="">
                                                 <p className="lead" style={{color:"#FF0072",fontWeight:"bolder",marginTop:10}}>
                                                     Your Stream:
                                                 </p>
                                                 <div className = "" style={{marginTop:25}}>
                                                     <div style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
-                                                        <a className="btn btn-md blink_me" onClick={this.awesomeFunction.bind(this)} style={{float:"right",color:"#00BFFF"}}>
-                                                            <b>Checkout other streaming options!</b>
-                                                        </a>
+                                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                                <RaisedButton label="Other streaming endpoints" secondary={true} onClick = {this.awesomeFunction.bind(this)} style={{float:"right"}} labelStyle={{fontSize:'80%'}}/>
+                                                        </MuiThemeProvider>
                                                         JSON changed &nbsp;
                                                         <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
                                                     </div>

@@ -1,4 +1,7 @@
-
+.customHighlight {
+	color: #FF0072;
+	/*box-shadow: 0px 2px 2px #FF0072;*/
+}
 .side-body{
 	/*background-color:;*/
 }
@@ -20,6 +23,7 @@ span.deleteIcon { display:none;}
 	height: 100%;
 	z-index: 99999;
 	background: url('./../img/loadingGIF.gif') 50% 50% no-repeat rgb(249,249,249);
+	opacity: 0.5;
 }
 
 #toastMessageAddNew, #streamItToast{
@@ -103,7 +107,7 @@ span.deleteIcon { display:none;}
   border-bottom: 1px solid #e7e7e7;
 }
 .side-menu .navbar-nav .active a {
-  background-color: transparent;
+  background-color: #FF0000;
   margin-right: -1px;
   border-right: 5px solid #e7e7e7;
 }
@@ -115,7 +119,7 @@ span.deleteIcon { display:none;}
 .side-menu .navbar-nav li a {
   padding: 15px;
   max-width: 170px;
-  font-weight: lighter;
+  /*font-weight: lighter;*/
   display:inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
