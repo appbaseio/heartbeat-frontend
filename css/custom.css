@@ -1,3 +1,20 @@
+.customHighlight {
+	color: #FF0072;
+	/*box-shadow: 0px 2px 2px #FF0072;*/
+}
+.side-body{
+	/*background-color:;*/
+}
+
+/*.sidebarLI { width:100px;height:100px;float:left;position:relative; }*/
+span.deleteIcon { display:none;}
+.sidebarLI:hover span.deleteIcon { display:block; }
+
+#streamEndpointLink{
+	/*padding: 10;*/
+	margin-bottom: -20px;
+}
+
 .loader {
 	position: fixed;
 	left: 0px;
@@ -6,10 +23,7 @@
 	height: 100%;
 	z-index: 99999;
 	background: url('./../img/loadingGIF.gif') 50% 50% no-repeat rgb(249,249,249);
-}
-
-span.deleteIcon:hover {
-    color:'#FF0000' !important;
+	opacity: 0.5;
 }
 
 #toastMessageAddNew, #streamItToast{
@@ -81,7 +95,7 @@ span.deleteIcon:hover {
   height: 100%;
   background-color: #f8f8f8;
   /*border-right: 1px solid #e7e7e7;*/
-  box-shadow: 3px 0px 5px #888888;
+  box-shadow: 3px 0px 5px #00BFFF;
   overflow: auto;
 }
 
@@ -93,7 +107,7 @@ span.deleteIcon:hover {
   border-bottom: 1px solid #e7e7e7;
 }
 .side-menu .navbar-nav .active a {
-  background-color: transparent;
+  background-color: #FF0000;
   margin-right: -1px;
   border-right: 5px solid #e7e7e7;
 }
@@ -105,7 +119,7 @@ span.deleteIcon:hover {
 .side-menu .navbar-nav li a {
   padding: 15px;
   max-width: 170px;
-  font-weight: lighter;
+  /*font-weight: lighter;*/
   display:inline-block;
   overflow: hidden;
   text-overflow: ellipsis;

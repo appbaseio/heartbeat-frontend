@@ -35,7 +35,7 @@ export default class PollingInterval extends Component {
                         step = {1}
                         defaultValue = {1}
                         onChange = {this.handleStateChange.bind(this)}
-
+                        value = {this.state.pollingInterval/5}
                     />
                 </MuiThemeProvider>
             </span>

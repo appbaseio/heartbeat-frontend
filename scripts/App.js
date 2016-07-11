@@ -24,7 +24,8 @@ export default class App extends Component {
         data : "",
         changedNum: 0,
         body : "",
-        exportCode : "",
+        exportCodeJS : "",
+        exportCodeCurl : "",
         highlightedExportCodeJS : "Nothing to export.",
         highlightedExportCodeCurl : "Nothing to export.",
         highlightedData : "Nothing streamed yet.",
@@ -32,7 +33,8 @@ export default class App extends Component {
         isNew: true,
         currentType : "addnew",
         currentStream : null,
-        isActive : true
+        isActive : true,
+        isHistorical: false
     };
 
     handleUrlChange = (e) => {
@@ -52,14 +54,20 @@ export default class App extends Component {
         if(!this.state.isActive){
             //gif indeicator
             $("#streamingIndicator").css({"visibility":"hidden"});
+            $("#streamEndpointLink").css({"visibility":"hidden"});
+            $("#responseArea").css({"display":"none"});
             return;
         }
         //gif indeicator
         $("#streamingIndicator").css({"visibility":"visible"});
-        console.log("this is currentStream");
-        console.log(this.state.currentStream);
-        if(this.state.currentStream!=null){this.state.currentStream.stop();}
-        console.log(type);
+        $("#streamEndpointLink").css({"visibility":"visible"});
+        $("#responseArea").css({"display":"block"});
+        // if(this.state.currentStream!=null){this.state.currentStream.stop();}
+        try{
+            this.state.currentStream.stop();
+        }catch(err){
+            console.log("no current stream");
+        }
         var config = {
             appname: this.refs.sidebar.state.app_name,
             username: this.refs.sidebar.state.credentials.write.split(':')[0],
@@ -72,68 +80,175 @@ export default class App extends Component {
             username: config.username,
             password: config.password
         });
-
-        var requestObject = {
-            id: "response",
-            type: config.type,
-            body: {
-                query: {
-                    match_all: {}
+        if(this.state.isHistorical){
+            $("#streamEndpointLink").css({"visibility":"hidden"});
+            var requestObject = {
+                type: config.type,
+                body: {
+                    query: {
+                        match_all: {}
+                    }
                 }
-            }
-        };
+            };
 
-        console.log(config);
+            var query = {
+                "bool": {
+                  "must_not": [
+                    {
+                      "ids": {
+                        "type": this.state.currentType,
+                        "values": ["details"]
+                      }
+                    }
+                  ]
+                }
+            };
+            query = JSON.stringify(query,null,4);
 
-        //displaying the export data
-        var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
-    url: 'https://scalr.api.appbase.io',\n\
+            //displaying the export data
+    //         var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+    //     url: 'https://scalr.api.appbase.io',\n\
+    //     appname: config.appname,\n\
+    //     username: config.username,\n\
+    //     password: config.password\n\});" + "\n" + "var requestObject = {\n\
+    //     type: config.type,\n\
+    //     body: {\n\t"+"query: "+query+"\n\};" + "\n" +"//to get the stream of updates on the endpoint, use this\n"+"appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
+    //     console.log('Use the stream object.');\n\
+    // }).on('error', function(error) {\n\
+    //     console.log('Error handling code');\n\});\
+    //     \n"+"//to get the historical data, use this\n"+"appbaseRef.search(requestObject).on('data', function(res) {\n\
+    //     console.log(res.hits.hits);\n\
+    // }).on('error', function(error) {\n\
+    //     console.log('Error handling code');\n\});";
+
+
+var exportCodeJS = '//include this script tag in your html\n\
+//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>\n\
+var config = {\n\
+    "appname": "'+this.refs.sidebar.state.app_name+'",\n\
+    "username": "'+ this.refs.sidebar.state.credentials.write.split(':')[0]+'",\n\
+    "password": "'+ this.refs.sidebar.state.credentials.write.split(':')[1]+'",\n\
+    "type": "'+this.state.currentType+'"\n\
+};\n\
+var appbaseRef = new Appbase({\n\
+    url: "https://scalr.api.appbase.io",\n\
     appname: config.appname,\n\
     username: config.username,\n\
-    password: config.password\n\});" + "\n" + "var requestObject = {\n\
-    id: \"response\",\n\
+    password: config.password\n\
+});\n\
+var requestObject = {\n\
     type: config.type,\n\
     body: {\n\
+        size: 300,\n\
         query: {\n\
-            match_all: {}\n\
+            "bool": {\n\
+                "must_not": [{\n\
+                    "ids": {\n\
+                        "type": "'+this.state.currentType+'",\n\
+                        "values": [\n\
+                            "details"\n\
+                        ]\n\
+                    }\n\
+                }]\n\
+            }\n\
         }\n\
-    }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
-    console.log('Use the stream object.')\n\
-}).on('error', function(error) {\n\
-    console.log('Error handling code');\n\});";
+    }\n\
+};\n\
+//to get the stream of updates on the endpoint, use this\n\
+appbaseRef.searchStream(requestObject).on("data", function(stream) {\n\
+    console.log("Use the stream object.");\n\
+}).on("error", function(error) {\n\
+    console.log("Error handling code");\n\
+});\n\
+//to get the historical data, use this\n\
+appbaseRef.search(requestObject).on("data", function(res) {\n\
+    console.log(res.hits.hits);\n\
+}).on("error", function(error) {\n\
+    console.log("Error handling code");\n\
+});'
 
 
-        var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
-        var temp = this.state;
-        temp.exportCode = exportCodeJS;
-        temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
-        temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
-        this.setState(temp)
+            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"size\":500,\"query\":"+query+"}'";
+            var temp = this.state;
+            temp.exportCodeJS = exportCodeJS;
+            temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
+            // temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            temp.exportCodeCurl = exportCodeCurl;
+            temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            this.setState(temp)
 
-        //to use inside the callback of searchStream
-        var a = this.state;
-        var f = this.setState;
-        var self = this;
+            //to use inside the callback of searchStream
+            var a = this.state;
+            var f = this.setState;
+            var self = this;
 
-
-        appbaseRef.get(requestObject).on('data', function(res){
-            if(res.found){
-                var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-                    //displaying the updated json data
-                    var temp = self.state;
-                    temp.data = JSON.stringify(stream._source, null, 4);
-                    temp.changedNum = temp.changedNum + 1;
-                    temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-                    self.setState(temp);
-                }).on('error', function(error) {
-                    console.log("Query error: ", JSON.stringify(error))
-                });
-
+            var currentStream = appbaseRef.searchStream(requestObject).on('data', function(stream) {
+                //displaying the updated json data
                 var temp = self.state;
-                temp.currentStream = currentStream;
+                temp.data = JSON.stringify(stream._source, null, 4);
+                temp.changedNum = temp.changedNum + 1;
+                temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
                 self.setState(temp);
-            }else{
-                appbaseRef.index(requestObject).on('data',function(res){
+            }).on('error', function(error) {
+                console.log("Query error: ", JSON.stringify(error))
+            });
+
+            var temp = self.state;
+            temp.currentStream = currentStream;
+            temp.data = JSON.stringify({"Message":"The polling has started, you will see your responses soon!"}, null, 4);
+            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+            self.setState(temp);
+        }else{
+            $("#streamEndpointLink").css({"visibility":"visible"});
+            var requestObject = {
+                id: "response",
+                type: config.type,
+                body: {
+                    query: {
+                        match_all: {}
+                    }
+                }
+            };
+            var fishy = {
+                id: "response",
+                type: config.type,
+                body: {
+                    "message": "Your request has been added, the polling will start soon!"
+                }
+            };
+            //displaying the export data
+            var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
+        url: 'https://scalr.api.appbase.io',\n\
+        appname: config.appname,\n\
+        username: config.username,\n\
+        password: config.password\n\});" + "\n" + "var requestObject = {\n\
+        id: \"response\",\n\
+        type: config.type,\n\
+        body: {\n\
+            query: {\n\
+                match_all: {}\n\
+            }\n\
+        }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
+        console.log('Use the stream object.')\n\
+    }).on('error', function(error) {\n\
+        console.log('Error handling code');\n\});";
+
+
+            var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
+            var temp = this.state;
+            temp.exportCodeJS = exportCodeJS;
+            temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
+            temp.exportCodeCurl = exportCodeCurl;
+            temp.highlightedExportCodeCurl = Prism.highlight(exportCodeCurl, Prism.languages.js);
+            this.setState(temp)
+
+            //to use inside the callback of searchStream
+            var a = this.state;
+            var f = this.setState;
+            var self = this;
+
+            appbaseRef.get(requestObject).on('data', function(res){
+                if(res.found){
                     var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
                         //displaying the updated json data
                         var temp = self.state;
@@ -147,50 +262,39 @@ export default class App extends Component {
 
                     var temp = self.state;
                     temp.currentStream = currentStream;
+                    temp.data = JSON.stringify(res._source, null, 4);
+                    temp.changedNum = temp.changedNum + 1;
+                    temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
                     self.setState(temp);
-                }).on('error',function(err){
-                    console.log("error in indexing the dummy"+err);
-                });
-            }
-        }).on('error', function(err){
-            console.log(err);
-        });
-        //indexing a dummy so that getStream doesnt give an error
-        // appbaseRef.index(requestObject).on('data',function(res){
-        //
-        //     var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-        //         //displaying the updated json data
-        //         var temp = self.state;
-        //         temp.data = JSON.stringify(stream._source, null, 4);
-        //         temp.changedNum = temp.changedNum + 1;
-        //         temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-        //         self.setState(temp);
-        //     }).on('error', function(error) {
-        //         console.log("Query error: ", JSON.stringify(error))
-        //     });
-        //
-        //     var temp = self.state;
-        //     temp.currentStream = currentStream;
-        //     self.setState(temp);
-        // }).on('error',function(err){
-        //     console.log("error in indexing the dummy"+err);
-        // });
+                }else{
+                    appbaseRef.index(fishy).on('data',function(res){
+                        var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
+                            //displaying the updated json data
+                            var temp = self.state;
+                            temp.data = JSON.stringify(stream._source, null, 4);
+                            temp.changedNum = temp.changedNum + 1;
+                            temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                            self.setState(temp);
+                        }).on('error', function(error) {
+                            console.log("Query error: ", JSON.stringify(error))
+                        });
 
-        // var currentStream = appbaseRef.getStream(requestObject).on('data', function(stream) {
-        //     //displaying the updated json data
-        //     var temp = self.state;
-        //     temp.data = JSON.stringify(stream._source, null, 4);
-        //     temp.changedNum = temp.changedNum + 1;
-        //     temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
-        //     self.setState(temp);
-        // }).on('error', function(error) {
-        //     console.log("Query error: ", JSON.stringify(error))
-        // });
-        //
-        // var temp = this.state;
-        // temp.currentStream = currentStream;
-        // this.setState(temp);
-
+                        var temp = self.state;
+                        temp.currentStream = currentStream;
+                        temp.data = JSON.stringify({"Message":"The polling has started, you will see your responses soon!"}, null, 4);
+                        temp.highlightedData = Prism.highlight(temp.data,Prism.languages.js);
+                        self.setState(temp);
+                    }).on('error',function(err){
+                        console.log("error in indexing the dummy"+err);
+                    });
+                }
+            }).on('error', function(err){
+                console.log(err);
+            });
+        }
+        $('html,body').animate({
+            scrollTop: $("#"+"responseArea").offset().top},
+        'slow');;
     };
 
     submitAndStream = () => {
@@ -201,125 +305,143 @@ export default class App extends Component {
                 $(".loader").fadeOut("fast");
                 return;
             }
+            //making the PUT request
             var currentTime = new Date().getTime().toString();
-            //setting the curretType
-            var temp = this.state;
-            temp.currentType = currentTime;
-            this.setState(temp);
-            var objectToIndex = {
-                restApiUrl : this.state.restApiUrl,
-                type : currentTime,
-                headers : this.refs.headers.state,
-                body : this.refs.body.state,
-                params : this.refs.params.state,
-                authDetails : this.refs.authDetails.state,
-                method : this.refs.method.state.method,
-                pollingInterval : this.refs.pollingInterval.state.pollingInterval,
-                title : this.refs.title.state.data,
-                credentials : this.refs.sidebar.state.credentials,
-                appName : this.refs.sidebar.state.app_name,
-                isActive: this.state.isActive
-                // isNew : false
-            };
-            var config = {
-                appname: this.refs.sidebar.state.app_name,
-                username: this.refs.sidebar.state.credentials.write.split(':')[0],
-                password: this.refs.sidebar.state.credentials.write.split(':')[1],
-                type: 'RESTAPIs'
-            };
-            var appbaseRef = new Appbase({
-                url: 'https://scalr.api.appbase.io',
-                appname: config.appname,
-                username: config.username,
-                password: config.password
-            });
-            var requestObject = {
-                type: config.type,
-                body: {
-                    type: currentTime,
-                    title: this.refs.title.state.data
-                },
-                id: currentTime, // this can be removed too, not an issue - toDiscuss
-            };
 
-            //keeping the name as self didnt work :/
-            var selff = this;
-            // console.log(self);
-            appbaseRef.index(requestObject).on('data', function(response) {
+            var username = this.refs.sidebar.state.credentials.write.split(":")[0];
+            var password = this.refs.sidebar.state.credentials.write.split(":")[1];
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "https://"+this.refs.sidebar.state.credentials.write+"@scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/_mappings/"+currentTime,
+              "method": "PUT",
+              "headers": {
+                "content-type": "application/json",
+                "Authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
+              },
+              "processData": false,
+              "data": "{\""+currentTime+"\": {\n      \"_ttl\": {\n          \"enabled\": true,\n          \"default\": \"6h\"\n      }\n}\n}"
+            }
+
+            var khud = this;
+            $.ajax(settings).done(function (response) {
+              console.log(response);
+              //setting the curretType
+              var temp = khud.state;
+              temp.currentType = currentTime;
+              khud.setState(temp);
+              var objectToIndex = {
+                  restApiUrl : khud.state.restApiUrl,
+                  type : currentTime,
+                  headers : khud.refs.headers.state,
+                  body : khud.refs.body.state,
+                  params : khud.refs.params.state,
+                  authDetails : khud.refs.authDetails.state,
+                  method : khud.refs.method.state.method,
+                  pollingInterval : khud.refs.pollingInterval.state.pollingInterval,
+                  title : khud.refs.title.state.data,
+                  credentials : khud.refs.sidebar.state.credentials,
+                  appName : khud.refs.sidebar.state.app_name,
+                  isActive: khud.state.isActive,
+                  isHistorical: khud.state.isHistorical
+                  // isNew : false
+              };
+              var config = {
+                  appname: khud.refs.sidebar.state.app_name,
+                  username: khud.refs.sidebar.state.credentials.write.split(':')[0],
+                  password: khud.refs.sidebar.state.credentials.write.split(':')[1],
+                  type: 'RESTAPIs'
+              };
+              var appbaseRef = new Appbase({
+                  url: 'https://scalr.api.appbase.io',
+                  appname: config.appname,
+                  username: config.username,
+                  password: config.password
+              });
+              var requestObject = {
+                  type: config.type,
+                  body: {
+                      type: currentTime,
+                      title: khud.refs.title.state.data
+                  },
+                  id: currentTime, // this can be removed too, not an issue - toDiscuss
+              };
+
+              //keeping the name as self didnt work :/
+              var selff = khud;
+              // console.log(self);
+              appbaseRef.index(requestObject).on('data', function(response) {
                 console.log("successfully indexed into RESTAPIs.");
-                console.log(selff);
-                var config = {
-                    appname: selff.refs.sidebar.state.app_name,
-                    username: selff.refs.sidebar.state.credentials.write.split(':')[0],
-                    password: selff.refs.sidebar.state.credentials.write.split(':')[1],
-                    type: currentTime
+                var settings = {
+                    "async": true,
+                    "crossDomain": true,
+                    "url": "https://scalr.api.appbase.io/"+selff.refs.sidebar.state.app_name+"/"+currentTime+"/details/?ttl=999d",
+                    "method": "PUT",
+                    "headers": {
+                      "content-type": "application/json",
+                      "authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
+                    },
+                    "data":JSON.stringify(objectToIndex)
                 };
-                var appbaseRef = new Appbase({
-                    url: 'https://scalr.api.appbase.io',
-                    appname: config.appname,
-                    username: config.username,
-                    password: config.password
-                });
-                var requestObject = {
-                    type: config.type,
-                    id: currentTime, // it will have the title
-                    body: objectToIndex
-                };
-                appbaseRef.index(requestObject).on('data',function(res){
-                    //streamAndUpdate(currentTime); // TODO -see what.
-                    console.log(res);
-                    //sending to server now
-                    var objectToSend = {
-                        details: objectToIndex,
-                        event_type: "index"
-                    };
-                    $.ajaxSetup({
-                        type: "POST",
-                        data: {},
-                        dataType: 'json',
-                        xhrFields: {
-                           withCredentials: false
-                        },
-                        crossDomain: true
+                $.ajax(settings).done(function(){
+                      //sending to server now
+                      var objectToSend = {
+                          details: objectToIndex,
+                          event_type: "index"
+                      };
+                      $.ajaxSetup({
+                          type: "POST",
+                          data: {},
+                          dataType: 'json',
+                          xhrFields: {
+                             withCredentials: false
+                          },
+                          crossDomain: true
+                      });
+                      var settings = {
+                        "async": false,
+                        "crossDomain": true,
+                        "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
+                        "method": "POST",
+                        dataType: "json",
+                        "data": objectToSend
+                      }
+                      //sending the backend
+                      $.ajax(settings).done(function (response) {
+                        //check from the response if it went okay.
+                        console.log(response);
+                        //streaming only after server responds
+                        console.log(selff);
+                        $(".loader").fadeOut("slow");
+                        toastr.success("Succesfully added!");
+                        //changing in the side bar
+                        var temp = selff.refs.sidebar.state;
+                        console.log(selff.refs.title.state.data);
+                        temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: selff.refs.title.state.data}};
+                        selff.refs.sidebar.setState(temp);
+                        var temp = selff.state;
+                        temp.isNew = false;
+                        temp.currentType = currentTime;
+                        selff.setState(temp);
+                        selff.streamAndUpdate(selff.state.currentType);
+                    }).error(function(){
+                        $(".loader").fadeOut("slow");
+                        toastr.error("Error in saving, refresh the page and try again!");
                     });
-                    var settings = {
-                      "async": false,
-                      "crossDomain": true,
-                      "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
-                      "method": "POST",
-                      dataType: "json",
-                      "data": objectToSend
-                    }
-                    $.ajax(settings).done(function (response) {
-                      //check from the response if it went okay.
-                      console.log(response);
-                      //streaming only after server responds
-                      console.log(selff);
-                      $(".loader").fadeOut("slow");
-                      toastr.success("Succesfully added!");
-                      //changing in the side bar
-                      var temp = selff.refs.sidebar.state;
-                      console.log(selff.refs.title.state.data);
-                      temp.titlesAndTypes[temp.titlesAndTypes.length] = {_source:{type: currentTime, title: selff.refs.title.state.data}};
-                      selff.refs.sidebar.setState(temp);
-                      var temp = selff.state;
-                      temp.isNew = false;
-                      temp.currentType = currentTime;
-                      selff.setState(temp);
-                      selff.streamAndUpdate(selff.state.currentType);
-                  }).error(function(){
-                      $(".loader").fadeOut("slow");
-                      toastr.error("Error in saving, refresh the page and try again!");
-                  });
-                }).on('error', function(err){
+                }).error(function(err){
                     $(".loader").fadeOut("slow");
                     toastr.error("Some error occured, try again in a moment?");
                     console.log(err);
-                })
-            }).on('error', function(error) {
+                });
+              }).on('error', function(error) {
+                  $(".loader").fadeOut("slow");
+                  toastr.error("Some error occured, try again in a moment?");
+                  console.log("error in indexing.");
+              });
+            }).error(function(err){
                 $(".loader").fadeOut("slow");
-                toastr.error("Some error occured, try again in a moment?");
-                console.log("error in indexing.");
+                toastr.error("Some error occured, try refreshing the page!");
+                console.log(err);
             });
         }else{
             var objectToIndex = {
@@ -334,32 +456,25 @@ export default class App extends Component {
                 title : this.refs.title.state.data,
                 credentials : this.refs.sidebar.state.credentials,
                 appName : this.refs.sidebar.state.app_name,
-                isActive: this.state.isActive
+                isActive: this.state.isActive,
+                isHistorical: this.state.isHistorical
             };
-            console.log(objectToIndex);
-            var config = {
-                appname: this.refs.sidebar.state.app_name,
-                username: this.refs.sidebar.state.credentials.write.split(':')[0],
-                password: this.refs.sidebar.state.credentials.write.split(':')[1],
-                type: this.state.currentType
+            var username = this.refs.sidebar.state.credentials.write.split(":")[0];
+            var password = this.refs.sidebar.state.credentials.write.split(":")[1];
+            var settings = {
+                "async": true,
+                "crossDomain": true,
+                "url": "https://scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/"+this.state.currentType+"/details/?ttl=999d",
+                "method": "PUT",
+                "headers": {
+                  "content-type": "application/json",
+                  "authorization" : 'Basic '+ new Buffer(username + ':' + password).toString('base64')
+                },
+                "data":JSON.stringify(objectToIndex)
             };
-            var appbaseRef = new Appbase({
-                url: 'https://scalr.api.appbase.io',
-                appname: config.appname,
-                username: config.username,
-                password: config.password
-            });
-            var requestObject = {
-                type: config.type,
-                id: config.type,
-                body: objectToIndex
-            };
-
-            //var streamAndUpdate = this.streamAndUpdate; // TODO -alag se save button and stream button
             var self = this;
-            appbaseRef.index(requestObject).on('data', function(response) {
+            $.ajax(settings).done(function(){
                 console.log("successfully indexed the new details");
-                //streamAndUpdate(currentTime); // TODO -see what.
                 //sending to server now
                 var objectToSend = {
                     details: objectToIndex,
@@ -392,13 +507,12 @@ export default class App extends Component {
                   $(".loader").fadeOut("slow");
                   toastr.error("Error in saving, refresh the page and try again!");
               });
-            }).on('error', function(error) {
+            }).error(function(){
                 console.log("error in indexing the new details.");
                 $(".loader").fadeOut("slow");
                 toastr.error("Some error occured, try again in a moment?");
             });
-            //start streaming
-            // this.state.currentStream.stop();
+
             this.streamAndUpdate(this.state.currentType);
 
             //emptying the json data part
@@ -417,9 +531,12 @@ export default class App extends Component {
         }
     }
 
-    changeTheContent = (type) => {
+    changeTheContent = (type,element) => {
+        $(".customHighlight").removeClass("customHighlight");
         //gif indeicator off
         $("#streamingIndicator").css({"visibility":"hidden"});
+        $("#streamEndpointLink").css({"visibility":"hidden"});
+        $("#responseArea").css({"display":"none"});
         var self = this;
         if (type == "addnew") {
             $('#toastMessageAddNew').stop().fadeIn(400).delay(3000).fadeOut(400);
@@ -432,7 +549,7 @@ export default class App extends Component {
             self.refs.params.setState({keyValuePairs : []});
             var temp = self.state;
             temp.restApiUrl = "";
-            temp.exportCode = "";
+            temp.exportCodeJS = "";
             temp.data = "";
             temp.changedNum = 0;
             temp.isNew = true;
@@ -441,10 +558,12 @@ export default class App extends Component {
             temp.highlightedExportCodeCurl = "Nothing to export.";
             temp.highlightedData = "Nothing streamed yet.";
             temp.isActive = true;
+            temp.isHistorical = false;
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
         }else{
             $(".loader").fadeIn("fast");
+            $(element.target).addClass("customHighlight");
             console.log(type);
             //$('#streamItToast').stop().fadeIn(400).delay(3000).fadeOut(400);
             var config = {
@@ -461,7 +580,7 @@ export default class App extends Component {
             });
             var requestObject = {
                 type: config.type,
-                id: type
+                id: "details"
             };
             appbaseRef.get(requestObject).on('data', function(res) {
                 // console.log('here');
@@ -478,7 +597,7 @@ export default class App extends Component {
                 self.refs.params.setState(obj.params);
                 var temp = self.state;
                 temp.restApiUrl = obj.restApiUrl;
-                temp.exportCode = "";
+                temp.exportCodeJS = "";
                 temp.data = "";
                 temp.changedNum = 0;
                 temp.isNew = false;
@@ -486,11 +605,14 @@ export default class App extends Component {
                 temp.highlightedExportCodeJS = "Nothing to export.";
                 temp.highlightedData = "Nothing streamed yet.";
                 temp.isActive = obj.isActive;
+                if(obj.isHistorical) temp.isHistorical = obj.isHistorical;
+                else temp.isHistorical = false;
                 self.setState(temp);
                 if(self.state.currentStream!=null){self.state.currentStream.stop();}
                 self.streamAndUpdate(type);
                 $(".loader").fadeOut("fast");
-                toastr.success("Successfully loaded!");
+                // toastr.success("Successfully loaded!");
+                toastr.info("Dont forget to hit Save after you change anything!!");
             }).on('error', function(err) {
                 $(".loader").fadeOut("fast");
                 toastr.error("Some error occured, try back in a moment?");
@@ -505,99 +627,137 @@ export default class App extends Component {
         this.setState(temp);
     }
 
+    hanldleHistorical = () => {
+        var temp = this.state;
+        temp.isHistorical = !temp.isHistorical;
+        this.setState(temp);
+    }
+
+    awesomeFunction= () => {
+        // console.log("here");
+        $("#coppoc").trigger("click");
+    }
+
     render(s){
-        // try{var bodyVisible = (this.refs.method.state.method == "POST" ? true : false)} catch(e){var bodyVisible = false}
-        // if(bodyVisible){
-        //     var bodyElement = <li><a data-toggle="tab" href="#body">Body</a></li>;
-        //     console.log(bodyElement);
-        // }else{
-        //     bodyElement = null;
-        //     console.log('no body');
-        // }
         return (
             <div>
                 <div>
                     <SideBar changeTheContent={this.changeTheContent} changeTheContentAfterDeletion={this.changeTheContentAfterDeletion} ref="sidebar" />
                 </div>
                 <div className = "container-fluid">
-                    <div className="side-body" style={{marginTop:5}}>
+                    <div className="side-body" style={{marginTop:5,paddingLeft:5}}>
                         <ul className="nav nav-tabs">
-                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint Settings</a></li>
-                            <li><a data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
-                            <li className="" style={{float:"right"}}><img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif" style={{height:30,width:30, marginTop:10, visibility:"hidden"}} /></li>
+                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
+                            <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
-                                <div className="row" style={{marginTop:5}}>
-                                    <GetTitle ref="title" />
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <span style={{float:"right",maxWidth:'20%', marginTop:45, marginRight:16}}>
+                                <div  className="" style={{boxShadow:"-3px 2px 5px #00BFFF", marginTop:20}}>
+                                    <div className="row" style={{marginTop:5}}>
+                                        <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder",marginTop:10}}>
+                                            &nbsp;&nbsp;Settings:
+                                        </p>
+                                        <GetTitle ref="title" />
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style={{float:"right",maxWidth:'20%', marginTop:50, marginRight:16}}>
+                                            <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <Toggle
+                                                    style = {{maxWidth:200}}
+                                                    ref="isActive"
+                                                    label = "Active/Inactive"
+                                                    toggled = {this.state.isActive}
+                                                    onToggle = {this.handleToggle}
+                                                    labelStyle =  {{
+                                                        //overflow:"hidden",
+                                                        //maxWidth:"50%"
+                                                    }}
+                                                />
+                                            </MuiThemeProvider>
+                                        </span>
+                                        <PollingInterval ref = "pollingInterval" />
+                                    </div>
+                                    <div className = "row" style={{}}>
+                                        <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <Toggle
-                                                style = {{maxWidth:200}}
-                                                ref="isActive"
-                                                label = "Active/Inactive"
-                                                toggled = {this.state.isActive}
-                                                onToggle = {this.handleToggle}
-                                                labelStyle =  {{
-                                                    //overflow:"hidden",
-                                                    //maxWidth:"50%"
-                                                }}
+                                            <TextField
+                                              hintText="http://www.exampleAPI.com/api/getUserDetails"
+                                              floatingLabelText="Type the REST API url here"
+                                              style={{width:'72%'}}
+                                              value = {this.state.restApiUrl}
+                                              onChange = {this.handleUrlChange}
                                             />
                                         </MuiThemeProvider>
-                                    </span>
-                                    <PollingInterval ref = "pollingInterval" />
-                                </div>
-                                <div className = "row" style={{}}>
-                                    <MethodBox ref="method" renderParent = {this.render.bind(this)} />&nbsp;
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                        <TextField
-                                          hintText="http://www.exampleAPI.com/api/getUserDetails"
-                                          floatingLabelText="Type the REST API url here"
-                                          style={{width:'72%'}}
-                                          value = {this.state.restApiUrl}
-                                          onChange = {this.handleUrlChange}
-                                        />
-                                    </MuiThemeProvider>
-                                    <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                            <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
-                                    </MuiThemeProvider>
-                                </div>
-                                <div className = "row">
-                                    <div className = "col-sm-6">
-                                        <div style={{marginTop:25}}>
-                                            <ul className="nav nav-tabs">
-                                                <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
-                                                <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
-                                                <li><a data-toggle="tab" href="#headers">Headers</a></li>
-                                                <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
-                                            </ul>
-                                            <div className="tab-content well lightWell" style={{marginTop:25}}>
-                                                <div id="params" className="tab-pane fade in active">
-                                                    <GetParams ref="params" />
-                                                </div>
-                                                <div id="auth" className="tab-pane fade">
-                                                    <GetAuthDetails ref = "authDetails" />
-                                                </div>
-                                                <div id="headers" className="tab-pane fade">
-                                                    <GetHeaders ref="headers" />
-                                                </div>
-                                                <div id="body" className="tab-pane fade">
-                                                    <GetBody ref="body" />
+                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
+                                        </MuiThemeProvider>
+                                    </div>
+                                    <div className = "row">
+                                        <div className = "col-sm-12">
+                                            <div style={{marginTop:25}}>
+                                                <ul className="nav nav-tabs">
+                                                    <li className="active"><a data-toggle="tab" href="#params" className="active">Params</a></li>
+                                                    <li><a data-toggle="tab" href="#auth">Basic Auth</a></li>
+                                                    <li><a data-toggle="tab" href="#headers">Headers</a></li>
+                                                    <li id="bodyTab" style={{"display":"none"}}><a data-toggle="tab" href="#body">Body(json)</a></li>
+                                                </ul>
+                                                <div className="tab-content well lightWell" style={{marginTop:25}}>
+                                                    <div id="params" className="tab-pane fade in active">
+                                                        <GetParams ref="params" />
+                                                    </div>
+                                                    <div id="auth" className="tab-pane fade">
+                                                        <GetAuthDetails ref = "authDetails" />
+                                                    </div>
+                                                    <div id="headers" className="tab-pane fade">
+                                                        <GetHeaders ref="headers" />
+                                                    </div>
+                                                    <div id="body" className="tab-pane fade">
+                                                        <GetBody ref="body" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className = "col-sm-6" style={{marginTop:25}}>
-                                        <div id="response" className="">
-                                            <div className = "well" style={{marginTop:10}}>
-                                                Your JSON changed: &nbsp;
-                                                <b>{this.state.changedNum}</b> times.<br /><br />
-                                                JSON Response:<br />
-                                                <pre style={{marginTop:10}}>
-                                                    <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
-                                                    </code>
-                                                </pre>
+                                </div>
+                                <div className = "row" id="responseArea" style={{height:"100%",display:"none"}}>
+                                    <div>
+                                        <div className = "col-sm-12" style={{boxShadow:"-3px 2px 5px #FF0072", marginTop:25}}>
+                                            <img id="streamingIndicator" className="img img-responsive" src="./../images/streamingIndicator.gif"
+                                                style={{float:"right",height:30,width:30,visibility:"hidden",marginTop:5}}></img>
+                                            <span style={{float:"right",maxWidth:'20%', marginTop:10, marginRight:50}}>
+                                                <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                    <Toggle
+                                                        style = {{minWidth:140}}
+                                                        ref="isHistorical"
+                                                        label = "Keep history"
+                                                        toggled = {this.state.isHistorical}
+                                                        onToggle = {this.hanldleHistorical}
+                                                        labelStyle =  {{
+                                                            fontSize:"100%"
+                                                        }}
+                                                    />
+                                                </MuiThemeProvider>
+                                            </span>
+                                            <div id="response" className="">
+                                                <p className="lead" style={{color:"#FF0072",fontWeight:"bolder",marginTop:10}}>
+                                                    Your Stream:
+                                                </p>
+                                                <div className = "" style={{marginTop:25}}>
+                                                    <div style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
+                                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                                <RaisedButton label="Other streaming endpoints" secondary={true} onClick = {this.awesomeFunction.bind(this)} style={{float:"right"}} labelStyle={{fontSize:'80%'}}/>
+                                                        </MuiThemeProvider>
+                                                        JSON changed &nbsp;
+                                                        <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                                    </div>
+                                                    <pre style={{marginTop:10,boxShadow:"-3px 0px 3px #FF0072",borderRadius:5}}>
+                                                        <a className="btn btn-sm" style={{float:"right",color:"#FF0072",animation:"blinker 1s linear infinite"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
+                                                            See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
+                                                        </a>
+                                                        <span className="badge">JSON Response:</span><br />
+                                                        <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
+                                                        </code>
+                                                    </pre>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -611,15 +771,21 @@ export default class App extends Component {
                                     </ul>
                                     <div className="tab-content" style={{marginTop:5,width:"90%"}}>
                                         <div id = "exportInCurl" className="tab-pane fade in active">
-                                            <pre>
-                                                <button className="copybtn btn btn-md btn-info" data-clipboard-target="#curlcode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
-                                                <code id="curlcode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
-                                                </code>
-                                            </pre>
+                                            <div>
+                                                <pre style={{boxShadow:"-3px 1px 3px #00BFFF",marginTop:10}}>
+                                                    <button className="copybtn btn btn-md btn-info" data-clipboard-target="#curlcode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
+                                                    <code id="curlcode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeCurl}}>
+                                                    </code>
+                                                </pre>
+                                            </div>
+                                            <div className="" style={{color:"#FF0072",fontSize:"80%"}}>
+                                            NOTE: Copy and paste this code into a terminal to see the historical data; the streaming of new responses will start automatically after that.
+                                            To have only the historical data, remove the "stream=true" URL parameter from the cURL request.
+                                            </div>
                                         </div>
                                         <div id = "exportInJS" className="tab-pane fade">
                                             <div id="exportCode" className="">
-                                                <pre>
+                                                <pre style={{boxShadow:"-3px 1px 3px #00BFFF"}}>
                                                     <button className="copybtn btn btn-md btn-info" data-clipboard-target="#jscode" style={{float:"right"}}><span className="glyphicon glyphicon-copy"></span></button>
                                                     <code id="jscode" contenteditable style={{fontSize:"85%"}} dangerouslySetInnerHTML={{__html: this.state.highlightedExportCodeJS}}>
                                                     </code>
