@@ -74,6 +74,7 @@ h6 {
     color: #f8f8f8;
     background: url(../img/intro-bg.jpg) no-repeat center center;
     background-size:cover;
+    height:100%;
 }
 
 .intro-message {
@@ -139,7 +140,7 @@ ul.intro-social-buttons {
 }
 
 .content-section-a {
-    height:90%;
+    /*height:90%;*/
     background-color: #f8f8f8;
 }
 
