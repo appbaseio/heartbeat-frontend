@@ -20,6 +20,6 @@ $.ajax({
     error: function(e) {
         console.log(e);
         console.log('unsucesseful');
-        window.location.href = 'index.html';
+        // window.location.href = 'index.html';
     }
 });

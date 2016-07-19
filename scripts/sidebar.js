@@ -292,7 +292,7 @@ export default class SideBar extends Component {
                         </div>
 
                         <div className="side-menu-container">
-                            <ul className="nav navbar-nav">
+                            <ul className="nav navbar-nav sidebarUL">
                                 {titlesAndTypes}
                             </ul>
                         </div>

@@ -14,6 +14,7 @@ import MethodBox from './methodBox.js';
 import PollingInterval from './pollingInterval.js'
 import SideBar from './sidebar.js'
 import Toggle from 'material-ui/Toggle';
+import DejavuTab from './dejavu.js';
 Prism = require('prismjs');
 var makePollerRequestObject = require('./pollerRequestObject.js');
 
@@ -97,7 +98,7 @@ export default class App extends Component {
                     {
                       "ids": {
                         "type": this.state.currentType,
-                        "values": ["details"]
+                        "values": ["details","response"]
                       }
                     }
                   ]
@@ -147,6 +148,7 @@ var requestObject = {\n\
                         "type": "'+this.state.currentType+'",\n\
                         "values": [\n\
                             "details"\n\
+                            "response"\n\
                         ]\n\
                     }\n\
                 }]\n\
@@ -168,7 +170,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
 });'
 
 
-            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"size\":500,\"query\":"+query+"}'";
+            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search? --data-binary '{\"size\":500,\"query\":"+query+"}'";
             var temp = this.state;
             temp.exportCodeJS = exportCodeJS;
             temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
@@ -424,6 +426,8 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                         temp.currentType = currentTime;
                         selff.setState(temp);
                         selff.streamAndUpdate(selff.state.currentType);
+                        //highlihghting
+                        $($($($("ul.sidebarUL").children()[1]).children()[1]).children()).addClass("customHighlight");
                     }).error(function(){
                         $(".loader").fadeOut("slow");
                         toastr.error("Error in saving, refresh the page and try again!");
@@ -523,6 +527,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
             self.setState(temp);
 
         }
+        this.handleDejavu();
     };
 
     changeTheContentAfterDeletion = (type) => {
@@ -561,6 +566,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
             temp.isHistorical = false;
             self.setState(temp);
             if(self.state.currentStream!=null){self.state.currentStream.stop();}
+            self.handleDejavu();
         }else{
             $(".loader").fadeIn("fast");
             $(element.target).addClass("customHighlight");
@@ -613,12 +619,14 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 $(".loader").fadeOut("fast");
                 // toastr.success("Successfully loaded!");
                 toastr.info("Dont forget to hit Save after you change anything!!");
+                self.handleDejavu();
             }).on('error', function(err) {
                 $(".loader").fadeOut("fast");
                 toastr.error("Some error occured, try back in a moment?");
                 console.log("getting details failed ", err);
             });
         } // else over here
+        // this.handleDejavu();
     }
 
     handleToggle = () => {
@@ -633,12 +641,52 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         this.setState(temp);
     }
 
-    awesomeFunction= () => {
+    awesomeFunction = () => {
         // console.log("here");
         $("#coppoc").trigger("click");
     }
+    awesomeFunction2 = () => {
+        // console.log("here");
+        $("#requestSettingsTabButton").trigger("click");
+    }
+
+    handleDejavu = () => {
+        console.log("handling dejavu");
+        console.log(this.state.currentType);
+        // console.log(CryptoJS.AES.decrypt("U2FsdGVkX19VCoUdUMtYruYAElAH9cafACrxcYoH8wNdZglBxV56hBBG+WYKt4NO/VXO4ywoevkxsL+nQ1psCUYT3YgtxMAEj0rfsMwy7hYHXhZkgxhS9+w4El5HDjEKKHxnQ7Jb3js+jOV/s8E+46AHDWW/6zeBwscraUBYj03FxM8YBsqgAV7rFypME6ByOjWK5JQohwJZUfzXa+eVa26QqIx4HQ0zNjZ5DXJJEs4xDvTTCs1dkVcv5LKvk8zdZz/snS64gk9n3qLdJZBUJ8DwqFjvwPtJRZYCXbpWzNYGu49qxrEaHvgJCWMQLjTKFOHjs84KJj46DY9AkxuXMw==","dejvu").toString(CryptoJS.enc.Utf8));
+        // console.log(this.state.isHistorical);
+        if(this.state.isHistorical){
+            $("#dejavuToggler").css({"display":"block"});
+            var obj = {
+                url: "https://"+this.refs.sidebar.state.credentials.write + "@scalr.api.appbase.io",
+                appname: this.refs.sidebar.state.app_name,
+                selectedType: [this.state.currentType]
+            };
+            var urlToSet = "https://appbaseio.github.io/dejaVu/live/index.html#?input_state="+CryptoJS.AES.encrypt(JSON.stringify(obj), "dejvu").toString();
+            // this.refs.dejavuTab.setState({cipher:cipher});
+            // $("#dejavu_iframe").attr('src','https://www.simplesite.com/');
+            $("#dejavu_iframe").remove();
+            var node = document.createElement("iframe");
+            node.id = "dejavu_iframe";
+            node.height = "90%";
+            node.width = "100%";
+            node.style.marginTop = "10";
+            document.getElementById("dejavuTab").appendChild(node);
+            console.log(node);
+            $("#dejavu_iframe").attr('src',urlToSet);
+        }else{
+            $("#dejavuToggler").css({"display":"none"});
+            $("#dejavu_iframe").remove();
+            this.awesomeFunction2();
+            $('html,body').animate({
+                scrollTop: $("#"+"responseArea").offset().top},
+            'slow');;
+            // $("#dejavu_iframe").attr('src','https://www.simplesite.com/');
+        }
+    }
 
     render(s){
+        // console.log(CryptoJS.AES.decrypt("U2FsdGVkX19VCoUdUMtYruYAElAH9cafACrxcYoH8wNdZglBxV56hBBG+WYKt4NO/VXO4ywoevkxsL+nQ1psCUYT3YgtxMAEj0rfsMwy7hYHXhZkgxhS9+w4El5HDjEKKHxnQ7Jb3js+jOV/s8E+46AHDWW/6zeBwscraUBYj03FxM8YBsqgAV7rFypME6ByOjWK5JQohwJZUfzXa+eVa26QqIx4HQ0zNjZ5DXJJEs4xDvTTCs1dkVcv5LKvk8zdZz/snS64gk9n3qLdJZBUJ8DwqFjvwPtJRZYCXbpWzNYGu49qxrEaHvgJCWMQLjTKFOHjs84KJj46DY9AkxuXMw==","dejvu"));
         return (
             <div>
                 <div>
@@ -647,8 +695,9 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 <div className = "container-fluid">
                     <div className="side-body" style={{marginTop:5,paddingLeft:5}}>
                         <ul className="nav nav-tabs">
-                            <li className="active"><a data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
+                            <li className="active"><a id="requestSettingsTabButton" data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
                             <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
+                            <li><a style={{"display":"none"}} data-toggle="tab" href="#dejavuTab" id="dejavuToggler"><b>Dejavu Tab</b></a></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
@@ -664,7 +713,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                                 <Toggle
                                                     style = {{maxWidth:200}}
                                                     ref="isActive"
-                                                    label = "Active/Inactive"
+                                                    label = "Active"
                                                     toggled = {this.state.isActive}
                                                     onToggle = {this.handleToggle}
                                                     labelStyle =  {{
@@ -688,7 +737,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                             />
                                         </MuiThemeProvider>
                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                                <RaisedButton label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
+                                                <RaisedButton data-toggle="tab" href="#requestSettings" label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                                         </MuiThemeProvider>
                                     </div>
                                     <div className = "row">
@@ -750,9 +799,10 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                                         <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
                                                     </div>
                                                     <pre style={{marginTop:10,boxShadow:"-3px 0px 3px #FF0072",borderRadius:5}}>
-                                                        <a className="btn btn-sm" style={{float:"right",color:"#FF0072",animation:"blinker 1s linear infinite"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
-                                                            See the stream endpoint in your browser <span className="glyphicon glyphicon-export"></span>
+                                                        <a className="btn btn-sm" style={{float:"right",color:"#FF0072",fontSize:"85%"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
+                                                            {this.state.exportCodeCurl.split(" ")[2]} <span className="glyphicon glyphicon-export"></span>
                                                         </a>
+                                                        <br />
                                                         <span className="badge">JSON Response:</span><br />
                                                         <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
                                                         </code>
@@ -779,8 +829,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                                 </pre>
                                             </div>
                                             <div className="" style={{color:"#FF0072",fontSize:"80%"}}>
-                                            NOTE: Copy and paste this code into a terminal to see the historical data; the streaming of new responses will start automatically after that.
-                                            To have only the historical data, remove the "stream=true" URL parameter from the cURL request.
+                                            NOTE: Copy and paste this code into a terminal to see the historical data.
                                             </div>
                                         </div>
                                         <div id = "exportInJS" className="tab-pane fade">
@@ -794,6 +843,9 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            <div id="dejavuTab" className="tab-pane fade in">
+                                <iframe style={{marginTop:10}} height="90%" width="100%" id="dejavu_iframe"></iframe>
                             </div>
                         </div>
                     </div>
