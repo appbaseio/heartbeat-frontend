@@ -2,7 +2,7 @@ var isLoggedIn = false;
 
 // open popup modal
 // Link of google login and github login is in modal html
-$('#loginButton').click(function() {
+$('.loginButton').click(function() {
     if(!isLoggedIn){
         $('.modal').modal('show');
     }else{

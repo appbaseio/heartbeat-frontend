@@ -34,7 +34,7 @@
 
 <body>
     <a href="heartbeat.appbase.io"><img id="brandImage" src="img/Heartbeat_Logo.svg" class="img img-responsive" height=100 width=200></img></a>
-    <a id="loginButton" class="btn btn-md btn-default">Login</a>
+    <a class="loginButton absolute btn btn-md btn-default">Login</a>
     <div class="modal fade">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -64,15 +64,14 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="intro-message">
-                        <h1>Transform REST endpoints into streaming APIs!</h1>
-                        <h3>Built for the #realtimeweb</h3>
-                        <a target="_blank" href="https://GlPcCpTb0:36ba56f5-389c-4591-b90e-a0055321d97a@scalr.api.appbase.io/heartbeat-50135002/1468093439800/response?stream=true" id="liveDemoLink"><span>See a live demo <span class="glyphicon glyphicon-triangle-right" style="font-size:13px"></span></span></a>
+                        <h1>Transform REST endpoints into streaming APIs</h1>
+                        <div style="color:#FF0072;padding-top:20px;font-size:150%">Built for the <b>#realtimeweb</b></div>
                         <ul class="list-inline intro-social-buttons">
                             <li>
-                                <a href="https://chrome.google.com/webstore/detail/heartbeat/kogebojdmfhcaipmkfnnandcjmppfplh?hl=en&gl=US" target="_blank" class="btn btn-default"><i class="fa fa-chrome fa-fw"></i><span class="network-name"> Chrome App</span></a>
+                                <a class="btn btn-default" onclick="  $('#videoplayer').get(0).scrollIntoView();"><i class="fa fa-youtube-play fa-fw"></i> <span class="network-name"> See the Video</span></a>
                             </li>
                             <li>
-                                <a href="https://github.com/appbaseio/heartbeat-frontend" target="_blank" class="btn btn-default"><i class="fa fa-github fa-fw"></i> <span class="network-name"> Github</span></a>
+                                <a class="loginButton btn btn-md btn-default"><i class="fa fa-user  fa-fw"></i> <span class="network-name"> Free Signup</span></a>
                             </li>
                         </ul>
                     </div>
@@ -93,33 +92,32 @@
             <div class="col-lg-4 col-sm-4 col-xs-12">
                 <center><img src="img/newIcon1.png" class="img img-responsive" height=200 width=200></img></center>
                 <center>
-                    <h3 class="section-heading">Zero lines of server-side code!</h3>
-                    <p class="lead">You don't need to write any server side coed for polling and getting updates! It's all done by us.</p>
+                    <h3 class="section-heading">Zero lines of server-side code</h3>
+                    <p class="lead">Heartbeat tranforms REST endpoints into streaming APIs painlessly, with zero lines of code. </p>
                 </center>
             </div>
 
             <div class="col-lg-4 col-sm-4 col-xs-12">
                 <center><img src="img/newIcon2.png" class="img img-responsive" height=200 width=200></img></center>
                 <center>
-                    <h3 class="section-heading">Access streams via dashboard, JS or a REST like API</h3>
-                    <p class="lead">You can access/observe/use the stream you get by heartbeatin' a REST endpoint via your dashboard, or you can also use the stream in your Application.</p>
+                    <h3 class="section-heading">Access via dashboard, JS or REST</h3>
+                    <p class="lead">Heartbeat transformed <b>streams</b> are accessible from the dashboard, or universally via Javascript and REST based APIs.</p>
                 </center>
             </div>
 
             <div class="col-lg-4 col-sm-4 col-xs-12">
                 <center><img src="img/newIcon3.png" class="img img-responsive" height=200 width=200></img></center>
                 <center>
-                    <h3 class="section-heading">Keep upto 6 hours of <i>historical data!</i></h3>
-                    <p class="lead">You have an option to maintain the historical data of your API source, of upto 6 hours! You can even perform rich queries on the data and
-                    do efficient analytics.</p>
+                    <h3 class="section-heading">Keep upto 6 hours of history</h3>
+                    <p class="lead">With the flick of a switch, heartbeat can store updates for up to six hours. It also provides an API and a data view for visually accessing historical data.</p>
                 </center>
             </div>
         </div>
         <div class="row" style="margin-top:50px">
             <div class="col-md-8 col-md-offset-2">
                 <center>
-                    <h3 class="section-heading">
-                        How <span style="color:#FF0072">Heartbeat&copy;</span> works?
+                    <h3 class="section-heading" id="videoplayer">
+                        2-min video: <span style="color:#FF0072">Heartbeat</span> in action
                     </h3>
                     <div class="embed-responsive embed-responsive-16by9" >
                       <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/B080u79AtxE"></iframe>
@@ -133,8 +131,8 @@
     <div class="container-fluid footer">
         <div class="row" style="margin:10px">
             <div class="col-lg-12">
-                <span class="copyright text-muted small">Copyright &copy; Heartbeat 2016. All Rights Reserved</span>
-                <span style="float:right">Made with <i class="fa fa-heart fa-fw"></i> by <a href="https://appbase.io" target="_blank">Appbase.io</a></span>
+                <span class="copyright text-muted small">Heartbeat is free to use while in beta. <a href="https://github.com/appbaseio/heartbeat-frontend" target="_blank"><span class="fa fa-github"> github</span></a></span>
+                <span style="float:right">Made with <i class="fa fa-heart fa-fw"></i> by <a href="https://appbase.io" target="_blank">appbase.io</a></span>
             </div>
         </div>
     </div>
