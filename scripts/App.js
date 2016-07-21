@@ -686,6 +686,11 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         }
     }
 
+    logout = () => {
+        var baseURL = window.location.protocol + "//" + window.location.host;
+        window.location.href = 'https://accapi.appbase.io/logout?next=' + baseURL;
+    }
+
     render(s){
         // console.log(CryptoJS.AES.decrypt("U2FsdGVkX19VCoUdUMtYruYAElAH9cafACrxcYoH8wNdZglBxV56hBBG+WYKt4NO/VXO4ywoevkxsL+nQ1psCUYT3YgtxMAEj0rfsMwy7hYHXhZkgxhS9+w4El5HDjEKKHxnQ7Jb3js+jOV/s8E+46AHDWW/6zeBwscraUBYj03FxM8YBsqgAV7rFypME6ByOjWK5JQohwJZUfzXa+eVa26QqIx4HQ0zNjZ5DXJJEs4xDvTTCs1dkVcv5LKvk8zdZz/snS64gk9n3qLdJZBUJ8DwqFjvwPtJRZYCXbpWzNYGu49qxrEaHvgJCWMQLjTKFOHjs84KJj46DY9AkxuXMw==","dejvu"));
         return (
@@ -699,6 +704,8 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                             <li className="active"><a id="requestSettingsTabButton" data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
                             <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
                             <li><a style={{"display":"none"}} data-toggle="tab" href="#dejavuTab" id="dejavuToggler"><b>Dejavu Tab</b></a></li>
+                            <li style={{float:"right"}}><span id="logoutButton" className="btn btn-md btn-inverse" onClick={this.logout} >Logout</span></li>
+
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
