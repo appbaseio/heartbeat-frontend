@@ -639,6 +639,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         var temp = this.state;
         temp.isHistorical = !temp.isHistorical;
         this.setState(temp);
+        this.submitAndStream();
     }
 
     awesomeFunction = () => {
@@ -653,8 +654,6 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
     handleDejavu = () => {
         console.log("handling dejavu");
         console.log(this.state.currentType);
-        // console.log(CryptoJS.AES.decrypt("U2FsdGVkX19VCoUdUMtYruYAElAH9cafACrxcYoH8wNdZglBxV56hBBG+WYKt4NO/VXO4ywoevkxsL+nQ1psCUYT3YgtxMAEj0rfsMwy7hYHXhZkgxhS9+w4El5HDjEKKHxnQ7Jb3js+jOV/s8E+46AHDWW/6zeBwscraUBYj03FxM8YBsqgAV7rFypME6ByOjWK5JQohwJZUfzXa+eVa26QqIx4HQ0zNjZ5DXJJEs4xDvTTCs1dkVcv5LKvk8zdZz/snS64gk9n3qLdJZBUJ8DwqFjvwPtJRZYCXbpWzNYGu49qxrEaHvgJCWMQLjTKFOHjs84KJj46DY9AkxuXMw==","dejvu").toString(CryptoJS.enc.Utf8));
-        // console.log(this.state.isHistorical);
         if(this.state.isHistorical){
             $("#dejavuToggler").css({"display":"block"});
             var obj = {
@@ -685,8 +684,12 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         }
     }
 
-    render(s){
-        // console.log(CryptoJS.AES.decrypt("U2FsdGVkX19VCoUdUMtYruYAElAH9cafACrxcYoH8wNdZglBxV56hBBG+WYKt4NO/VXO4ywoevkxsL+nQ1psCUYT3YgtxMAEj0rfsMwy7hYHXhZkgxhS9+w4El5HDjEKKHxnQ7Jb3js+jOV/s8E+46AHDWW/6zeBwscraUBYj03FxM8YBsqgAV7rFypME6ByOjWK5JQohwJZUfzXa+eVa26QqIx4HQ0zNjZ5DXJJEs4xDvTTCs1dkVcv5LKvk8zdZz/snS64gk9n3qLdJZBUJ8DwqFjvwPtJRZYCXbpWzNYGu49qxrEaHvgJCWMQLjTKFOHjs84KJj46DY9AkxuXMw==","dejvu"));
+    logout = () => {
+        var baseURL = window.location.protocol + "//" + window.location.host;
+        window.location.href = 'https://accapi.appbase.io/logout?next=' + baseURL;
+    }
+
+    render(s) {
         return (
             <div>
                 <div>
@@ -698,6 +701,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                             <li className="active"><a id="requestSettingsTabButton" data-toggle="tab" href="#requestSettings" className="active"><span className="glyphicon glyphicon-cog"></span> Configure</a></li>
                             <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><span className="glyphicon glyphicon-globe"></span> Access via Code</a></li>
                             <li><a style={{"display":"none"}} data-toggle="tab" href="#dejavuTab" id="dejavuToggler"><span className="glyphicon glyphicon-th-list"></span> Data View</a></li>
+                            <li style={{float:"right"}}><span id="logoutButton" className="btn btn-md btn-inverse" onClick={this.logout} >Logout</span></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
