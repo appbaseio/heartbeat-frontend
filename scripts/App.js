@@ -695,20 +695,23 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 <div className = "container-fluid">
                     <div className="side-body" style={{marginTop:5,paddingLeft:5}}>
                         <ul className="nav nav-tabs">
-                            <li className="active"><a id="requestSettingsTabButton" data-toggle="tab" href="#requestSettings" className="active"><b>REST</b> Endpoint</a></li>
-                            <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><b>Streaming</b> Endpoints</a></li>
-                            <li><a style={{"display":"none"}} data-toggle="tab" href="#dejavuTab" id="dejavuToggler"><b>Dejavu Tab</b></a></li>
+                            <li className="active"><a id="requestSettingsTabButton" data-toggle="tab" href="#requestSettings" className="active"><span className="glyphicon glyphicon-cog"></span> Configure</a></li>
+                            <li><a id="coppoc" data-toggle="tab" href="#streamEndpoint"><span className="glyphicon glyphicon-globe"></span> Access via Code</a></li>
+                            <li><a style={{"display":"none"}} data-toggle="tab" href="#dejavuTab" id="dejavuToggler"><span className="glyphicon glyphicon-th-list"></span> Data View</a></li>
                         </ul>
                         <div className="tab-content">
                             <div id="requestSettings" className="tab-pane fade in active">
                                 <div  className="" style={{boxShadow:"-3px 2px 5px #00BFFF", marginTop:20}}>
                                     <div className="row" style={{marginTop:5}}>
-                                        <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder",marginTop:10}}>
-                                            &nbsp;&nbsp;Settings:
+                                        <p className="lead" style={{color:"#00BFFF",fontWeight:"bolder",marginTop:10,paddingLeft:10}}>
+                                            REST API
                                         </p>
+                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
+                                                <RaisedButton data-toggle="tab" href="#requestSettings" label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
+                                        </MuiThemeProvider>
                                         <GetTitle ref="title" />
                                         &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span style={{float:"right",maxWidth:'20%', marginTop:50, marginRight:16}}>
+                                        <span style={{float:"right",maxWidth:'20%', marginTop:30, marginRight:16}}>
                                             <MuiThemeProvider muiTheme={getMuiTheme()}>
                                                 <Toggle
                                                     style = {{maxWidth:200}}
@@ -730,14 +733,11 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
                                             <TextField
                                               hintText="http://www.exampleAPI.com/api/getUserDetails"
-                                              floatingLabelText="Type the REST API url here"
+                                              floatingLabelText="Type the REST API URL here"
                                               style={{width:'72%'}}
                                               value = {this.state.restApiUrl}
                                               onChange = {this.handleUrlChange}
                                             />
-                                        </MuiThemeProvider>
-                                        <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                                <RaisedButton data-toggle="tab" href="#requestSettings" label="Save" primary={true} onClick = {this.submitAndStream} style={{marginRight:16, marginTop:20, maxWidth:100,maxHeight:50, float:"right"}} labelStyle={{fontSize:'90%'}}/>
                                         </MuiThemeProvider>
                                     </div>
                                     <div className = "row">
@@ -777,7 +777,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                                     <Toggle
                                                         style = {{minWidth:140}}
                                                         ref="isHistorical"
-                                                        label = "Keep history"
+                                                        label = "Keep History"
                                                         toggled = {this.state.isHistorical}
                                                         onToggle = {this.hanldleHistorical}
                                                         labelStyle =  {{
@@ -788,22 +788,21 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                                             </span>
                                             <div id="response" className="">
                                                 <p className="lead" style={{color:"#FF0072",fontWeight:"bolder",marginTop:10}}>
-                                                    Your Stream:
+                                                    Stream API<br />
                                                 </p>
                                                 <div className = "" style={{marginTop:25}}>
                                                     <div style={{color:"#00BFFF",fontWeight:"bold",fontSize:"110%"}}>
                                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
-                                                                <RaisedButton label="Other streaming endpoints" secondary={true} onClick = {this.awesomeFunction.bind(this)} style={{float:"right"}} labelStyle={{fontSize:'80%'}}/>
+                                                                <RaisedButton label="Access via Code" secondary={true} onClick = {this.awesomeFunction.bind(this)} style={{float:"right"}} labelStyle={{fontSize:'80%'}}/>
                                                         </MuiThemeProvider>
-                                                        JSON changed &nbsp;
-                                                        <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                                        JSON updated <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
                                                     </div>
                                                     <pre style={{marginTop:10,boxShadow:"-3px 0px 3px #FF0072",borderRadius:5}}>
                                                         <a className="btn btn-sm" style={{float:"right",color:"#FF0072",fontSize:"85%"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
                                                             {this.state.exportCodeCurl.split(" ")[2]} <span className="glyphicon glyphicon-export"></span>
                                                         </a>
                                                         <br />
-                                                        <span className="badge">JSON Response:</span><br />
+                                                        <span className="badge">Response</span><br /><br/>
                                                         <code dangerouslySetInnerHTML={{__html: this.state.highlightedData}}>
                                                         </code>
                                                     </pre>

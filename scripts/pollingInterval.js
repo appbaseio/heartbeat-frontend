@@ -8,7 +8,7 @@ export default class PollingInterval extends Component {
 
     state = {
         pollingInterval : 5
-    };
+    }
 
     handleStateChange = (e,v) => {
         var temp = this.state;
@@ -25,9 +25,9 @@ export default class PollingInterval extends Component {
                 float: 'right',
                 marginRight: 15,
                 marginBottom: -40,
-                marginTop: 0
+                marginTop: 10
             }} >
-                <small style={{fontWeight:"bold"}}>Polling Interval: <br /> {this.state.pollingInterval} min(s)</small>
+                <small style={{fontWeight:"bold"}}>Poll every {this.state.pollingInterval} min(s)</small>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                     <Slider
                         min = {0}

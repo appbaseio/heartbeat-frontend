@@ -14,16 +14,9 @@ export default class GetTitle extends Component {
         var temp =this.state;
         temp.data = e.target.value;
         this.setState(temp);
-        // console.log(this.state.data);
     }
 
-    // floatingLabelStyle = {{
-    //     fontSize:'90%',
-    //     color:'#00BFFF',
-    //     }}
-
-    render(){
-        //floatingLabelText dekhna hai.
+    render() {
         return(
             <MuiThemeProvider muiTheme={getMuiTheme()}>
                 <TextField
@@ -32,10 +25,10 @@ export default class GetTitle extends Component {
                   style={{maxWidth:'70%',width:'65%', marginLeft:15}}
                   value = {this.state.data}
                   floatingLabelFixed = {true}
-                  floatingLabelText = "Stream Name"
+                  floatingLabelText = "Endpoint Name"
                 />
             </MuiThemeProvider>
         );
-    };
+    }
 
 }
