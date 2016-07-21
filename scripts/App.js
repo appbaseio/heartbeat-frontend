@@ -639,6 +639,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
         var temp = this.state;
         temp.isHistorical = !temp.isHistorical;
         this.setState(temp);
+        this.submitAndStream();
     }
 
     awesomeFunction = () => {
