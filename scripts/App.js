@@ -140,7 +140,7 @@ var appbaseRef = new Appbase({\n\
 var requestObject = {\n\
     type: config.type,\n\
     body: {\n\
-        size: 300,\n\
+        size: 100,\n\
         query: {\n\
             "bool": {\n\
                 "must_not": [{\n\
@@ -170,7 +170,7 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
 });'
 
 
-            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search? --data-binary '{\"size\":500,\"query\":"+query+"}'";
+            var exportCodeCurl = "curl -N -XPOST https://"+this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/_search?stream=true --data-binary '{\"size\":100,\"query\":"+query+"}'";
             var temp = this.state;
             temp.exportCodeJS = exportCodeJS;
             temp.highlightedExportCodeJS = Prism.highlight(exportCodeJS, Prism.languages.js);
@@ -618,11 +618,11 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 self.streamAndUpdate(type);
                 $(".loader").fadeOut("fast");
                 // toastr.success("Successfully loaded!");
-                toastr.info("Dont forget to hit Save after you change anything!!");
+                toastr.info("Hit save to affect a change permanently!");
                 self.handleDejavu();
             }).on('error', function(err) {
                 $(".loader").fadeOut("fast");
-                toastr.error("Some error occured, try back in a moment?");
+                toastr.error("Oops! An error occured, can you try back in some time?");
                 console.log("getting details failed ", err);
             });
         } // else over here
