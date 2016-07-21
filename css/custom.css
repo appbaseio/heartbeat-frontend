@@ -1,3 +1,7 @@
+.btn {
+    border-radius: 0;
+}
+
 #logoutButton {
     /*position:absolute;
     z-index: 300;
