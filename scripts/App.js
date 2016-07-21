@@ -146,10 +146,7 @@ var requestObject = {\n\
                 "must_not": [{\n\
                     "ids": {\n\
                         "type": "'+this.state.currentType+'",\n\
-                        "values": [\n\
-                            "details"\n\
-                            "response"\n\
-                        ]\n\
+                        "values": ["details", "response"]\n\
                     }\n\
                 }]\n\
             }\n\
