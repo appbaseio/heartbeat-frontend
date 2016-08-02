@@ -60,8 +60,12 @@ section {
 	padding-top: 5px;
 	font-weight: lighter;
 }
-#detail-section {
-	min-height: 1000px;
+pre.single-card {
+	background: #f5f5f5 !important;
+	box-shadow: rgb(0, 191, 255) -3px 1px 3px;
+}
+code, kbd, pre, samp {
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace !important;
 }
 .footer {
 	padding: 0;
