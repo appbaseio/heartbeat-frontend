@@ -13,7 +13,7 @@ section {
 	display: flex;
 }
 .single-card {
-	border-radius: 2px;
+	border-radius: 5px;
 	background: #fafafa;
 	padding: 15px;
 	box-shadow: 0 1px 3px 0 rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 2px 1px -1px rgba(0,0,0,.12);
@@ -68,13 +68,11 @@ section {
 	max-width: 150px;
 	margin: auto;
 }
-.single-card .streamEndpointLink {
-	color: rgb(255, 0, 114);
-    display: block;
-    margin-bottom: 0;
-    text-align: left;
-    margin-top: -15px;
-    padding: 0;
+.streamEndpointLink {
+	margin-bottom: 0;
+	text-align: left;
+	padding: 0;
+	font-weight: 100;
 }
 .single-card .title-badge,
 .single-card code span:first-child {
@@ -82,8 +80,11 @@ section {
 }
 .lead {
 	color: rgb(0, 191, 255); 
-	font-weight: bolder; 
+	font-weight: bold; 
 	margin-top: 10px; 
+}
+.rest-endpoint {
+	font-weight: 100;
 }
 .img-container .vertical-center {
 	max-width: 100%;

@@ -2,13 +2,14 @@ $(document).ready(function() {
     var searchStream;
 
     // endpoint list and code snippet
-    var avilableEndPoint = {
+    var availableEndPoint = {
         "bitcoin": {
             "config": {
                 "appname": "heartbeat-37053210",
                 "username": "RjfbzbOrZ",
                 "password": "c42f9cc9-371c-4f14-b4f8-36ed46915cc1",
-                "type": "demoBitcoin"
+                "type": "demoBitcoin",
+                "rest": "https://api.bitcoinaverage.com/ticker/global/USD/"
             }
         },
         "wikipedia": {
@@ -16,15 +17,17 @@ $(document).ready(function() {
                 "appname": "heartbeat-37053210",
                 "username": "RjfbzbOrZ",
                 "password": "c42f9cc9-371c-4f14-b4f8-36ed46915cc1",
-                "type": "demoWiki"
+                "type": "demoWiki",
+                "rest": "https://en.wikipedia.org/w/api.php?action=query&list=recentchanges&rcprop=title|ids|sizes|flags|user&rclimit=3"
             }
         },
-        "weather": {
+        "github": {
             "config": {
                 "appname": "heartbeat-37053210",
                 "username": "RjfbzbOrZ",
                 "password": "c42f9cc9-371c-4f14-b4f8-36ed46915cc1",
-                "type": "demoWeather"
+                "type": "demoGithub",
+                "rest": "https://api.github.com/events"
             }
         }
     }
@@ -40,7 +43,8 @@ $(document).ready(function() {
     // get the selected object and set highlight over here
     function setSelected(method) {
         $('.method-name').html(method);
-        var selectedEndPoint = avilableEndPoint[method];
+        $('.rest-endpoint').attr('href', availableEndPoint[method].config.rest).text(availableEndPoint[method].config.rest);
+        var selectedEndPoint = availableEndPoint[method];
         
         var appbaseRef = new Appbase({
             url: "https://scalr.api.appbase.io",
@@ -74,7 +78,8 @@ $(document).ready(function() {
             
         // set endpoint in ui
         selectedEndPoint.endPoint = 'https://'+selectedEndPoint.config.username+':'+selectedEndPoint.config.password+'@scalr.api.appbase.io/'+selectedEndPoint.config.appname+'/'+selectedEndPoint.config.type+'/response?stream=true';
-        $('.streamEndpointLink').attr('href', selectedEndPoint.endPoint).text(selectedEndPoint.endPoint);
+        selectedEndPoint.endPointText = 'https://scalr.api.appbase.io/'+selectedEndPoint.config.appname+'/'+selectedEndPoint.config.type+'/response?stream=true';
+        $('.streamEndpointLink').attr('href', selectedEndPoint.endPoint).text(selectedEndPoint.endPointText);
 
         // set code snippet
         var snippet = createSnippet(selectedEndPoint.config);
@@ -96,10 +101,10 @@ curl -N https://'+config.username+':'+config.password+'@scalr.api.appbase.io/'+c
         var javascript_snippet = '\n\
 var appbaseRef = new Appbase({\n\
     url: "https://'+config.username+':'+config.password+'@scalr.api.appbase.io",\n\
-    appname: "'+config.appname+'",\n\
-    });\n\
-appbaseRef.getStream({type: "'+config.appname+'", id: "response"}).on("data", function(stream) {\n\
-    console.log("Use the stream object.")\n\
+    appname: "'+config.appname+'"\n\
+});\n\
+appbaseRef.getStream({type: "'+config.type+'", id: "response"}).on("data", function(stream) {\n\
+    console.log("streaming object: ", stream)\n\
 });';
         return {
             curl: curl_snippet,

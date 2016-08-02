@@ -59,6 +59,9 @@
     <!-- card-section START -->
     <section class="container">
         <!-- cards-contianer START -->
+        <div class="row" style="text-align:center;margin-bottom:1em;font-size:2em">
+					Heartbeat Live Demo
+				</div>
         <div class="row cards-container">
             <!-- Single-card start -->
             <div class="col-sm-4 col-xs-12">
@@ -88,12 +91,12 @@
             <!-- Single-card END -->
             <!-- Single-card start -->
             <div class="col-sm-4 col-xs-12">
-                <div class="single-card single-project-container weather-card demo-card" data-method="weather">
-                    <div class="img-bg" style="background-image:url('img/demo/weather.png')">
+                <div class="single-card single-project-container github-card demo-card" data-method="github">
+                    <div class="img-bg" style="background-image:url('img/demo/github.png')">
                     </div>
                     <div class="card-container">
                         <div class="card-tag-line">
-                            Weather
+                            Github
                         </div>
                     </div>
                 </div>
@@ -106,16 +109,13 @@
 
     <!-- response-section START -->
     <section class="container" id="response-section">
-        <p class="lead col-xs-12 p-0">URL & Stream Response of <span class="method-name"></span> </p>
+        <p class="lead col-xs-12 p-0">Original REST endpoint: <a class="rest-endpoint" target="_blank"></a><span style="float:right">Polled every 10s</span></p>
         <div class="col-xs-12 p-0">
-            <p class="lead pull-left">JSON update <span class="json-update"></span> </p>
+        <p class="lead col-xs-12 p-0">Heartbeat transformed streaming endpoint: <a class="streamEndpointLink" target="_blank"></a></p>
+            <p class="lead pull-left">Streaming update #<span class="json-update"></span> </p>
             <img id="streamingIndicator" class="img img-responsive pull-right" src="./../images/streamingIndicator.gif">
         </div>
         <pre class="single-card">
-            <span class="badge pull-left">Endpoint</span>
-            <a class="btn btn-sm streamEndpointLink" target="_blank" href="https://yuXbPFaSo:af5ac9a8-7381-4385-b1f1-7be8cee3c945@scalr.api.appbase.io/heartbeat-224253/1470054632735/response?stream=true"><span class="glyphicon glyphicon-export"></span>&nbsp;https://yuXbPFaSo:af5ac9a8-7381-4385-b1f1-7be8cee3c945@scalr.api.appbase.io/heartbeat-224253/1470054632735/response?stream=true
-            </a>
-            <span class="badge title-badge">Response</span>
             <code class="language-javascript response-object">
             </code>
         </pre>
@@ -124,7 +124,7 @@
 
     <!-- code-section START -->
     <section class="container" id="code-section">
-        <p class="lead">Access via Code</p>
+        <p class="lead">Streaming via Code</p>
         <div>
           <!-- Nav tabs -->
           <ul class="nav nav-tabs" role="tablist">
@@ -132,7 +132,7 @@
                 <a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">Javascript</a>
             </li>
             <li role="presentation">
-                <a href="#curl" aria-controls="curl" role="tab" data-toggle="tab">Curl</a>
+                <a href="#curl" aria-controls="curl" role="tab" data-toggle="tab">cURL</a>
             </li>
           </ul>
           <!-- Tab panes -->
