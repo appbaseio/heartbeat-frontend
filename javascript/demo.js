@@ -41,8 +41,7 @@ $(document).ready(function() {
     function setSelected(method) {
         $('.method-name').html(method);
         var selectedEndPoint = avilableEndPoint[method];
-        $('.loader').show();
-
+        
         var appbaseRef = new Appbase({
             url: "https://scalr.api.appbase.io",
             appname: selectedEndPoint.config.appname,
@@ -58,20 +57,11 @@ $(document).ready(function() {
           }
         };
 
-        //to get the historical data, use this
-        appbaseRef.search(requestObject).on("data", function(res) {
-            $('.loader').hide();
-            var responseObjectString = JSON.stringify(res, null, 4);
-            setHighlight(responseObjectString, '.response-object');
-        }).on("error", function(error) {
-            console.log("Error handling code");
-        });
-
         //let's stop previous stream if exists
         try {
             searchStream.stop();
         } catch(e) {}
-        var jsonUpdate = 1;
+        var jsonUpdate = 0;
         $('.json-update').html(jsonUpdate);
 
         //to get the stream of updates on the endpoint, use this
@@ -85,7 +75,7 @@ $(document).ready(function() {
         });
             
         // set endpoint in ui
-        selectedEndPoint.endPoint = 'https://'+selectedEndPoint.config.username+':'+selectedEndPoint.config.password+'@scalr.api.appbaseio.io/'+selectedEndPoint.config.appname+'/'+selectedEndPoint.config.type+'/_search';
+        selectedEndPoint.endPoint = 'https://'+selectedEndPoint.config.username+':'+selectedEndPoint.config.password+'@scalr.api.appbase.io/'+selectedEndPoint.config.appname+'/'+selectedEndPoint.config.type+'/response?stream=true';
         $('.streamEndpointLink').attr('href', selectedEndPoint.endPoint).text(selectedEndPoint.endPoint);
 
         // set code snippet
@@ -103,31 +93,13 @@ $(document).ready(function() {
     // pass config option and create related snippet
     function createSnippet(config) {
         var curl_snippet = 'curl -N https://'+config.username+':'+config.password+'@scalr.api.appbase.io/'+config.appname+'/'+config.type+'/response?stream=true';
-        var javascript_snippet = '//include this script tag in your html\n\
-//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>\n\
-var config = {\n\
-    "appname": "'+config.appname+'",\n\
-    "username": "'+config.username+'",\n\
-    "password": "'+config.password+'",\n\
-    "type": "'+config.type+'"\n\
-};\n\
+        var javascript_snippet = '\n\
 var appbaseRef = new Appbase({\n\
-    url: "https://scalr.api.appbase.io",\n\
-    appname: config.appname,\n\
-    username: config.username,\n\
-    password: config.password\n\
-});\n\n\
-//to get the stream of updates on the endpoint, use this\n\
-appbaseRef.searchStream(requestObject).on("data", function(stream) {\n\
-    console.log("Use the stream object.");\n\
-}).on("error", function(error) {\n\
-    console.log("Error handling code");\n\
-});\n\n\
-//to get the historical data, use this\n\
-appbaseRef.search(requestObject).on("data", function(res) {\n\
-    console.log(res.hits.hits);\n\
-}).on("error", function(error) {\n\
-    console.log("Error handling code");\n\
+    url: "https://v0ZtJ34Td:e098e765-fadc-40f6-a866-9c294db15c82@scalr.api.appbase.io",\n\
+    appname: "'+config.appname+'",\n\
+    });\n\
+appbaseRef.getStream({type: "demoWiki", id: "response"}).on("data", function(stream) {\n\
+    console.log("Use the stream object.")\n\
 });';
         return {
             curl: curl_snippet,
