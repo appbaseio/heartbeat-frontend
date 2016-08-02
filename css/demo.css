@@ -42,6 +42,11 @@ section {
 .single-card code span:first-child {
 	float: left;
 }
+.lead {
+	color: rgb(0, 191, 255); 
+	font-weight: bolder; 
+	margin-top: 10px; 
+}
 .img-container .vertical-center {
 	max-width: 100%;
     margin: auto;
