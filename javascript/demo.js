@@ -49,12 +49,8 @@ $(document).ready(function() {
             password: selectedEndPoint.config.password
         });
         var requestObject = {
-          type: selectedEndPoint.config.type,
-          body: {
-            query: {
-              match_all: {}
-            }
-          }
+            type: selectedEndPoint.config.type,
+            id: "response"
         };
 
         //let's stop previous stream if exists
@@ -63,9 +59,11 @@ $(document).ready(function() {
         } catch(e) {}
         var jsonUpdate = 0;
         $('.json-update').html(jsonUpdate);
+        var responseObjectString = JSON.stringify({}, null, 4);
+        setHighlight(responseObjectString, '.response-object');    
 
         //to get the stream of updates on the endpoint, use this
-        searchStream = appbaseRef.searchStream(requestObject).on("data", function(res) {
+        searchStream = appbaseRef.getStream(requestObject).on("data", function(res) {
             var responseObjectString = JSON.stringify(res, null, 4);
             setHighlight(responseObjectString, '.response-object');
             jsonUpdate++;
@@ -86,19 +84,21 @@ $(document).ready(function() {
 
     // set highlight using prism
     function setHighlight(responseObject, selector) {
-        var response_markup = Prism.highlight(responseObject, Prism.languages.javascript);
+        var lang = selector == '.curl-snippet' ? '' : Prism.languages.javascript; 
+        var response_markup = Prism.highlight(responseObject, lang);
         $(selector).html(response_markup);
     }
 
     // pass config option and create related snippet
     function createSnippet(config) {
-        var curl_snippet = 'curl -N https://'+config.username+':'+config.password+'@scalr.api.appbase.io/'+config.appname+'/'+config.type+'/response?stream=true';
+        var curl_snippet = '\n\
+curl -N https://'+config.username+':'+config.password+'@scalr.api.appbase.io/'+config.appname+'/'+config.type+'/response?stream=true';
         var javascript_snippet = '\n\
 var appbaseRef = new Appbase({\n\
-    url: "https://v0ZtJ34Td:e098e765-fadc-40f6-a866-9c294db15c82@scalr.api.appbase.io",\n\
+    url: "https://'+config.username+':'+config.password+'@scalr.api.appbase.io",\n\
     appname: "'+config.appname+'",\n\
     });\n\
-appbaseRef.getStream({type: "demoWiki", id: "response"}).on("data", function(stream) {\n\
+appbaseRef.getStream({type: "'+config.appname+'", id: "response"}).on("data", function(stream) {\n\
     console.log("Use the stream object.")\n\
 });';
         return {
