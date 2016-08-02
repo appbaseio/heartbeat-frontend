@@ -13,7 +13,7 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
+    
     <!-- Custom CSS -->
     <link href="css/landing-page.css" rel="stylesheet">
     <link href="css/demo.css" rel="stylesheet">
@@ -21,7 +21,12 @@
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/styles/default.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.1/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/highlight.min.js"></script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -57,7 +62,7 @@
         <div class="row cards-container">
             <!-- Single-card start -->
             <div class="col-sm-4 col-xs-12">
-                <div class="single-card" >
+                <div class="single-card bitcoin-card active demo-card" data-method="bitcoin">
                     <div class="img-container">
                         <span class="vertical-center">
                             <img src="img/demo/bitcoin.jpg" class="img img-responsive" />
@@ -71,7 +76,7 @@
             <!-- Single-card END -->
             <!-- Single-card start -->
             <div class="col-sm-4 col-xs-12">
-                <div class="single-card">
+                <div class="single-card wiki-card demo-card" data-method="wiki">
                     <div class="img-container">
                         <span class="vertical-center">
                             <img src="img/demo/wiki.png" class="img img-responsive" />
@@ -85,7 +90,7 @@
             <!-- Single-card END -->
             <!-- Single-card start -->
             <div class="col-sm-4 col-xs-12">
-                <div class="single-card">
+                <div class="single-card weather-card demo-card" data-method="weather">
                     <div class="img-container">
                         <span class="vertical-center">
                             <img src="img/demo/weather.png" class="img img-responsive" />
@@ -102,11 +107,49 @@
     </section>
     <!-- card-section END -->
 
-    <!-- detail-section START -->
-    <section class="container" id="detail-section">
-        
+    <!-- response-section START -->
+    <section class="container" id="response-section">
+        <pre class="single-card">
+            <span class="badge pull-left">Endpoint</span>
+            <a class="btn btn-sm streamEndpointLink" target="_blank" href="https://yuXbPFaSo:af5ac9a8-7381-4385-b1f1-7be8cee3c945@scalr.api.appbase.io/heartbeat-224253/1470054632735/response?stream=true"><span class="glyphicon glyphicon-export"></span>&nbsp;https://yuXbPFaSo:af5ac9a8-7381-4385-b1f1-7be8cee3c945@scalr.api.appbase.io/heartbeat-224253/1470054632735/response?stream=true
+            </a>
+            <span class="badge title-badge">Response</span>
+            <code class="language-javascript response-object">
+            </code>
+        </pre>
     </section>
-    <!-- detail-section END -->
+    <!-- response-section END -->
+
+    <!-- code-section START -->
+    <section class="container" id="code-section">
+        <div>
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#javascript" aria-controls="javascript" role="tab" data-toggle="tab">Javascript</a>
+            </li>
+            <li role="presentation">
+                <a href="#curl" aria-controls="curl" role="tab" data-toggle="tab">Curl</a>
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="javascript">
+                <pre class="single-card">
+                    <code class="language-javascript javascript-snippet">
+                    </code>
+                </pre>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="curl">
+                <pre class="single-card">
+                    <code class="language-javascript curl-snippet">
+                    </code>
+                </pre>
+            </div>
+          </div>
+        </div>
+    </section>
+    <!-- response-section END -->
 
     
     <!-- Footer -->
@@ -157,4 +200,5 @@
  ga('create', 'UA-54082612-9', 'auto');
  ga('send', 'pageview');
 </script>
+<script type="text/javascript" src="javascript/demo.js"></script>
 </html>

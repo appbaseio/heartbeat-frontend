@@ -12,7 +12,7 @@ section {
 .cards-container {
 	display: flex;
 }
-.cards-container .single-card {
+.single-card {
 	border-radius: 2px;
 	background: #fafafa;
 	padding: 15px;
@@ -20,12 +20,27 @@ section {
 	height: 100%;
 	cursor: pointer;
 }
-.cards-container .single-card:hover {
+.single-card:hover, .single-card.active {
 	background: #f5f5f5;
 }
-.cards-container .single-card .img-container {
+.single-card.active .title {
+	color: rgb(255, 0, 114);
+}
+.single-card .img-container {
 	max-width: 150px;
 	margin: auto;
+}
+.single-card .streamEndpointLink {
+	color: rgb(255, 0, 114);
+    display: block;
+    margin-bottom: 0;
+    text-align: left;
+    margin-top: -15px;
+    padding: 0;
+}
+.single-card .title-badge,
+.single-card code span:first-child {
+	float: left;
 }
 .img-container .vertical-center {
 	max-width: 100%;
@@ -44,6 +59,10 @@ section {
 	min-height: 1000px;
 }
 .footer {
+	padding: 0;
+	margin-top: 30px; 
+}
+.p-0 {
 	padding: 0;
 }
 
