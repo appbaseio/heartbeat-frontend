@@ -30,19 +30,33 @@ $.ajaxSetup({
 
 
 // check if user is already logged or not
-$.ajax({
-    type: "GET",
-    url: 'https://accapi.appbase.io/user',
-    dataType: 'json',
-    contentType: "application/json",
-    success: function(full_data) {
-        console.log(full_data);
-        isLoggedIn = true;
-        // window.location.href = 'nextPage.html'
-        document.getElementById('loginButton').innerHTML = 'Go to dashboard';
-    },
-    error: function(e) {
-        console.log("not logged in.");
-        // $('.modal').modal('show');
-    }
-});
+var accapi_counter = 0;
+accapi(accapi_counter);
+function accapi(accapi_counter) {
+    var returnFlag = false;
+    var req = $.ajax({
+        type: "GET",
+        url: 'https://accapi.appbase.io/user',
+        dataType: 'json',
+        contentType: "application/json",
+        success: function(full_data) {
+            returnFlag = true;
+            console.log(full_data);
+            isLoggedIn = true;
+            // window.location.href = 'nextPage.html'
+            $('.loginButton').html('Go to dashboard');
+        },
+        error: function(e) {
+            console.log("not logged in.");
+            // $('.modal').modal('show');
+            returnFlag = true;
+        }
+    });
+    setTimeout(function() {
+        if(!returnFlag && accapi_counter < 4) {
+            req.abort();
+            accapi_counter++;
+            accapi(accapi_counter);
+        }
+    }, 3000);
+}
