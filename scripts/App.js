@@ -106,25 +106,8 @@ export default class App extends Component {
             };
             query = JSON.stringify(query,null,4);
 
-            //displaying the export data
-    //         var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
-    //     url: 'https://scalr.api.appbase.io',\n\
-    //     appname: config.appname,\n\
-    //     username: config.username,\n\
-    //     password: config.password\n\});" + "\n" + "var requestObject = {\n\
-    //     type: config.type,\n\
-    //     body: {\n\t"+"query: "+query+"\n\};" + "\n" +"//to get the stream of updates on the endpoint, use this\n"+"appbaseRef.searchStream(requestObject).on('data', function(stream) {\n\
-    //     console.log('Use the stream object.');\n\
-    // }).on('error', function(error) {\n\
-    //     console.log('Error handling code');\n\});\
-    //     \n"+"//to get the historical data, use this\n"+"appbaseRef.search(requestObject).on('data', function(res) {\n\
-    //     console.log(res.hits.hits);\n\
-    // }).on('error', function(error) {\n\
-    //     console.log('Error handling code');\n\});";
-
-
-var exportCodeJS = '//include this script tag in your html\n\
-//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>\n\
+var exportCodeJS = '// Include this script tag in your html\n\
+// <script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>\n\
 var config = {\n\
     "appname": "'+this.refs.sidebar.state.app_name+'",\n\
     "username": "'+ this.refs.sidebar.state.credentials.write.split(':')[0]+'",\n\
@@ -136,7 +119,8 @@ var appbaseRef = new Appbase({\n\
     appname: config.appname,\n\
     username: config.username,\n\
     password: config.password\n\
-});\n\
+});\n\n\
+// We will query everything except the meta documents set by heartbeat app\n\
 var requestObject = {\n\
     type: config.type,\n\
     body: {\n\
@@ -152,14 +136,14 @@ var requestObject = {\n\
             }\n\
         }\n\
     }\n\
-};\n\
-//to get the stream of updates on the endpoint, use this\n\
+};\n\n\
+// To get the stream of updates on the endpoint, use this\n\
 appbaseRef.searchStream(requestObject).on("data", function(stream) {\n\
     console.log("Use the stream object.");\n\
 }).on("error", function(error) {\n\
     console.log("Error handling code");\n\
 });\n\
-//to get the historical data, use this\n\
+// To get the historical data, use this\n\
 appbaseRef.search(requestObject).on("data", function(res) {\n\
     console.log(res.hits.hits);\n\
 }).on("error", function(error) {\n\
@@ -216,22 +200,13 @@ appbaseRef.search(requestObject).on("data", function(res) {\n\
                 }
             };
             //displaying the export data
-            var exportCodeJS = '//include this script tag in your html'+"\n"+'//<script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var config = " + JSON.stringify(config, null, 4) + ";\n" + "var appbaseRef = new Appbase({\n\
-        url: 'https://scalr.api.appbase.io',\n\
-        appname: config.appname,\n\
-        username: config.username,\n\
-        password: config.password\n\});" + "\n" + "var requestObject = {\n\
-        id: \"response\",\n\
-        type: config.type,\n\
-        body: {\n\
-            query: {\n\
-                match_all: {}\n\
-            }\n\
-        }\n\};" + "\n" + "appbaseRef.getStream(requestObject).on('data', function(stream) {\n\
-        console.log('Use the stream object.')\n\
+            var exportCodeJS = '// Include this script tag in your html'+"\n"+'// <script src="https://rawgit.com/appbaseio/appbase-js/master/browser/appbase.js" type="text/javascript"></script>' + "\n" + "var appbaseRef = new Appbase({\n\
+        url: 'https://"+config.username+":"+config.password+"@scalr.api.appbase.io',\n\
+        appname: '"+config.appname+"'\n\});" + "\n\n// Get streaming updates when a new data change occurs\n"
+        + "appbaseRef.getStream({type: '"+config.type+"', id: 'response'}).on('data', function(stream) {\n\
+        console.log('streaming update: ', stream)\n\
     }).on('error', function(error) {\n\
-        console.log('Error handling code');\n\});";
-
+        console.log('streaming error: ', error);\n\});";
 
             var exportCodeCurl = "curl -N https://" + this.refs.sidebar.state.credentials.read + "@scalr.api.appbase.io/" + this.refs.sidebar.state.app_name + "/" + this.state.currentType + "/response?stream=true";
             var temp = this.state;
