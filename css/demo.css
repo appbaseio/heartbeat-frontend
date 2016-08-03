@@ -6,6 +6,15 @@ nav .navbar-brand {
 	max-width: 200px;
 	padding-top: 5px;
 }
+.navbar-nav>li>a.loginButton {
+	right: 6px;
+    top: 6px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #F50057;
+    color: #F50057;
+    padding: 6px 12px;
+}
 section {
 	padding-top: 30px;
 }
