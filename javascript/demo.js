@@ -63,8 +63,8 @@ $(document).ready(function() {
         } catch(e) {}
         var jsonUpdate = 0;
         $('.json-update').html(jsonUpdate);
-        var responseObjectString = JSON.stringify({}, null, 4);
-        setHighlight(responseObjectString, '.response-object');    
+        var responseObjectString = "Waiting for the first stream update ..";
+        setHighlight(responseObjectString, '.response-object', true);    
 
         //to get the stream of updates on the endpoint, use this
         searchStream = appbaseRef.getStream(requestObject).on("data", function(res) {
@@ -88,8 +88,12 @@ $(document).ready(function() {
     }
 
     // set highlight using prism
-    function setHighlight(responseObject, selector) {
-        var lang = selector == '.curl-snippet' ? '' : Prism.languages.javascript; 
+    function setHighlight(responseObject, selector, langFlag) {
+        if(!langFlag) {
+            var lang = selector == '.curl-snippet' ? '' : Prism.languages.javascript; 
+        } else {
+            var lang = '';
+        }
         var response_markup = Prism.highlight(responseObject, lang);
         $(selector).html(response_markup);
     }
