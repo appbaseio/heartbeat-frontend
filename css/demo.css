@@ -14,6 +14,7 @@ nav .navbar-brand {
     border-color: #F50057;
     color: #F50057;
     padding: 6px 12px;
+    cursor: pointer;
 }
 section {
 	padding-top: 30px;
