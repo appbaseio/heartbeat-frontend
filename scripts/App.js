@@ -756,7 +756,7 @@ export default class App extends Component {
                                                 </pre>
                                             </div>
                                             <div className="" style={{color:"#FF0072",fontSize:"80%"}}>
-                                            NOTE: Copy and paste this code into a terminal to see the historical data.
+                                            NOTE: Copy and paste this code into a <b>terminal</b> to see the result(s).
                                             </div>
                                         </div>
                                         <div id = "exportInJS" className="tab-pane fade">
