@@ -62,7 +62,8 @@ $(document).ready(function() {
             searchStream.stop();
         } catch(e) {}
         var jsonUpdate = 0;
-        $('.json-update').html(jsonUpdate);
+
+        $('.json-update').html("#"+jsonUpdate);
         var responseObjectString = "Waiting for the first stream update ..";
         setHighlight(responseObjectString, '.response-object', true);    
 
@@ -71,7 +72,7 @@ $(document).ready(function() {
             var responseObjectString = JSON.stringify(res, null, 4);
             setHighlight(responseObjectString, '.response-object');
             jsonUpdate++;
-            $('.json-update').html(jsonUpdate);
+            $('.json-update').html("#"+jsonUpdate);
         }).on("error", function(error) {
             console.log("Error handling code");
         });

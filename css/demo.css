@@ -22,6 +22,9 @@ section {
 .cards-container {
 	display: flex;
 }
+.heartbeat-color {
+	color: #F50057
+}
 .single-card {
 	border-radius: 5px;
 	background: #fafafa;
