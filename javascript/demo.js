@@ -91,7 +91,7 @@ $(document).ready(function() {
     // set highlight using prism
     function setHighlight(responseObject, selector, langFlag) {
         if(!langFlag) {
-            var lang = selector == '.curl-snippet' ? Prism.languages.bash : Prism.languages.javascript;
+            var lang = selector == '.curl-snippet' ? '' : Prism.languages.javascript;
         } else {
             var lang = '';
         }
