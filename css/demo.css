@@ -2,13 +2,16 @@ nav.navbar-default {
 	border-right: 0;
 	border-radius: 0;
 }
+nav .navbar-header {
+	display: block;
+    width: 100%;
+}
 nav .navbar-brand {
 	max-width: 200px;
 	padding-top: 5px;
 }
-.navbar-nav>li>a.loginButton {
-	right: 6px;
-    top: 6px;
+a.loginButton {
+	margin: 8px;
     border-style: solid;
     border-width: 1px;
     border-color: #F50057;
@@ -16,11 +19,15 @@ nav .navbar-brand {
     padding: 6px 12px;
     cursor: pointer;
 }
+a.loginButton:hover {
+    text-decoration: none;
+}
 section {
 	padding-top: 30px;
 }
-.cards-container {
-	display: flex;
+.cards-container > div{
+	padding-bottom: 15px;
+	min-height: 200px;
 }
 .heartbeat-color {
 	color: #F50057
@@ -57,8 +64,8 @@ section {
 	display: table;
 	text-align: center;
 	width: 100%;
-	height: 100%;
 	font-size: 30px;
+	height: 166px;
 }
 .single-card .card-tag-line {
 	display: table-cell;
@@ -145,5 +152,18 @@ code, kbd, pre, samp {
     z-index: 99999;
     background: url('./../img/loadingGIF.gif') 50% 50% no-repeat rgb(249,249,249);
     opacity: 0.5;
+}
+@media (max-width:767px) {
+	nav .navbar-brand {
+		max-width: 170px;
+		padding-left: 0;
+	}
+	a.loginButton {
+		margin-right: 0;
+	}
+	.container-fluid>.navbar-header {
+		margin-right: 0;
+		margin-left: 0;
+	}
 }
 
