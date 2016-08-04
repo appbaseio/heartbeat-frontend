@@ -98,6 +98,9 @@ section {
 .single-card code span:first-child {
 	float: left;
 }
+.single-card code.curl-snippet span:first-child {
+	float: none;
+}
 .lead {
 	color: rgb(0, 191, 255); 
 	font-weight: bold; 
