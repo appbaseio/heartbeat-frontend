@@ -27,7 +27,7 @@ export default class PollingInterval extends Component {
                 marginBottom: -40,
                 marginTop: 10
             }} >
-                <small style={{fontWeight:"bold"}}>Poll every {this.state.pollingInterval} min(s)</small>
+                <small style={{fontWeight:"bold"}}>Poll every {this.state.pollingInterval} min{this.state.pollingInterval !== 1 ? "s" : ""}</small>
                 <MuiThemeProvider muiTheme={getMuiTheme()}>
                     <Slider
                         min = {0}
