@@ -723,7 +723,7 @@ export default class App extends Component {
                                                         <MuiThemeProvider muiTheme={getMuiTheme()}>
                                                                 <RaisedButton label="Access via Code" secondary={true} onClick = {this.awesomeFunction.bind(this)} style={{float:"right"}} labelStyle={{fontSize:'80%'}}/>
                                                         </MuiThemeProvider>
-                                                        JSON updated <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> times.</span><br /><br />
+                                                        JSON updated <span style={{color:"#FF0072"}}><b>{this.state.changedNum}</b> time{this.state.changedNum !== 1 ? "s" : ""}.</span><br /><br />
                                                     </div>
                                                     <pre style={{marginTop:10,boxShadow:"-3px 0px 3px #FF0072",borderRadius:5}}>
                                                         <a className="btn btn-sm" style={{float:"right",color:"#FF0072",fontSize:"85%"}} id="streamEndpointLink" href={this.state.exportCodeCurl.split(" ")[2]} target="_blank">
