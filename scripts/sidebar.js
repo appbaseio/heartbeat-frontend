@@ -17,8 +17,10 @@ export default class SideBar extends Component {
             url: 'https://accapi.appbase.io/app/' + app_name,
             dataType: 'json',
             contentType: "application/json",
-            success: function(full_data) {
-                console.log(full_data);
+            complete: function(xhr) {
+                var full_data = xhr.responseJSON;
+                // console.log(full_data);
+                // console.log(1);
                 permission(full_data.body.id, 'write', app_name);
             }
         });
@@ -29,10 +31,16 @@ export default class SideBar extends Component {
         var self = this;
         if (method == 'read') {
             $.ajax({
-                async: false,
+                // async: false, // had to remove this, talk about this.
                 type: "GET",
                 url: 'https://accapi.appbase.io/app/' + app_id + '/permissions',
-                success: function(full_data) {
+                beforeSend: function(xhr) {
+                    xhr.withCredentials = true;
+                },
+                complete: function(xhr) {
+                    var full_data = xhr.responseJSON;
+                    // console.log(full_data);
+                    // console.log(2);
                     var permission_credentials = {
                         read: '',
                         write: ''
@@ -74,7 +82,10 @@ export default class SideBar extends Component {
                     "read": true,
                     "write": false
                 }),
-                success: function(full_data) {
+                copmlete: function(xhr) {
+                    var full_data = xhr.responseJSON;
+                    // console.log(full_data);
+                    // console.log(3);
                     self.permission(app_id, 'read', app_name);
                 }
             });
@@ -101,7 +112,10 @@ export default class SideBar extends Component {
             url: 'https://accapi.appbase.io/user',
             dataType: 'json',
             contentType: "application/json",
-            success: function(full_data) {
+            complete: function(xhr) {
+                var full_data = xhr.responseJSON;
+                // console.log(full_data);
+                // console.log(4);
                 var app_property = Object.getOwnPropertyNames(full_data.body.apps);
                 var app_creation_flag = true;
                 var single_app = {};
@@ -180,6 +194,7 @@ export default class SideBar extends Component {
             },
             event_type: "delete"
         };
+        //TODO wtf?? xhrFields in setup and in settings too required for this to work in both chrome and firefox. :/
         $.ajaxSetup({
             type: "POST",
             data: {},
@@ -190,7 +205,10 @@ export default class SideBar extends Component {
             crossDomain: true
         });
         var settings = {
-          "async": false,
+            beforeSend: function(xhr) {
+                xhr.withCredentials = true;
+            },
+        //   "async": false, // had to remove this, talk about it
           "crossDomain": true,
           "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
           "method": "POST",

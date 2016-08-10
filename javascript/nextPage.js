@@ -16,15 +16,19 @@ function accapi(accapi_counter) {
         url: 'https://accapi.appbase.io/user',
         dataType: 'json',
         contentType: "application/json",
-        success: function(full_data) {
-            returnFlag = true;
-            successCb(full_data);
-        },
+        // success: function(full_data) {
+        //     returnFlag = true;
+        //     successCb(full_data);
+        // },
         error: function(e) {
             console.log(e);
             console.log('unsucesseful');
             window.location.href = 'index.html';
             returnFlag = true;
+        },
+        complete: function(xhr){
+            returnFlag = true;
+            successCb(xhr.responseJSON);
         }
     });
     setTimeout(function() {
