@@ -237,9 +237,13 @@ export default class App extends Component {
             var username = this.refs.sidebar.state.credentials.write.split(":")[0];
             var password = this.refs.sidebar.state.credentials.write.split(":")[1];
             var settings = {
+                beforeSend: function(xhr) {
+                    xhr.withCredentials = true;
+                    console.log(xhr);
+                },
               "async": true,
               "crossDomain": true,
-              "url": "https://"+this.refs.sidebar.state.credentials.write+"@scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/_mappings/"+currentTime,
+              "url": "https://scalr.api.appbase.io/"+this.refs.sidebar.state.app_name+"/_mappings/"+currentTime,
               "method": "PUT",
               "headers": {
                 "content-type": "application/json",
@@ -248,7 +252,6 @@ export default class App extends Component {
               "processData": false,
               "data": "{\""+currentTime+"\": {\n      \"_ttl\": {\n          \"enabled\": true,\n          \"default\": \"6h\"\n      }\n}\n}"
             }
-
             var khud = this;
             $.ajax(settings).done(function (response) {
               console.log(response);
@@ -325,7 +328,7 @@ export default class App extends Component {
                           crossDomain: true
                       });
                       var settings = {
-                        "async": false,
+                        "async": true,
                         "crossDomain": true,
                         "url": "https://" + require('./config.js').serverURL + "/api/addEvent/",
                         "method": "POST",
@@ -352,9 +355,10 @@ export default class App extends Component {
                         selff.streamAndUpdate(selff.state.currentType);
                         //highlihghting
                         $($($($("ul.sidebarUL").children()[1]).children()[1]).children()).addClass("customHighlight");
-                    }).error(function(){
+                    }).error(function(err){
                         $(".loader").fadeOut("slow");
                         toastr.error("Error in saving, refresh the page and try again!");
+                        console.log(err);
                     });
                 }).error(function(err){
                     $(".loader").fadeOut("slow");
@@ -369,7 +373,7 @@ export default class App extends Component {
             }).error(function(err){
                 $(".loader").fadeOut("slow");
                 toastr.error("Some error occured, try refreshing the page!");
-                console.log(err);
+                console.log("Error: "+JSON.stringify(err));
             });
         }else{
             var objectToIndex = {
