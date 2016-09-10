@@ -30,9 +30,8 @@ $.ajaxSetup({
 
 
 // check if user is already logged or not
-var accapi_counter = 0;
-accapi(accapi_counter);
-function accapi(accapi_counter) {
+accapi();
+function accapi() {
     var returnFlag = false;
     var req = $.ajax({
         type: "GET",
@@ -52,11 +51,4 @@ function accapi(accapi_counter) {
             returnFlag = true;
         }
     });
-    setTimeout(function() {
-        if(!returnFlag && accapi_counter < 4) {
-            req.abort();
-            accapi_counter++;
-            accapi(accapi_counter);
-        }
-    }, 3000);
 }
